@@ -5,9 +5,9 @@
  * (color scheme 1-6, type settings) so the clone matches the live store.
  */
 @theme {
-  --font-heading: var(--font-playfair), "Playfair Display", serif;
-  --font-body: var(--font-plex), "IBM Plex Sans", sans-serif;
-  --font-accent: var(--font-montserrat), "Montserrat", sans-serif;
+  --font-heading: "Playfair Display", serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-accent: "Montserrat", sans-serif;
   --font-sans: var(--font-body);
 
   --color-foreground: #000000;
