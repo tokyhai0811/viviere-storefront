@@ -5,7 +5,8 @@ built to test a move to a [MedusaJS](https://medusajs.com) backend.
 
 - **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4
 - **Images:** every image is a blank grey placeholder (`src/components/placeholder.tsx`)
-- **Data:** mock products shaped like Medusa's Store API (`src/lib/types.ts`, `src/lib/data/`)
+- **Data:** a [Medusa v2 backend](https://github.com/tokyhai0811/viviere-backend) when configured,
+  otherwise mock products shaped like Medusa's Store API (`src/lib/types.ts`, `src/lib/data/`)
 
 ## Run it
 
@@ -28,15 +29,24 @@ npm run build && npm start   # production build
 Design tokens (fonts, colours, square corners, uppercase buttons, 90rem page width)
 come from `config/settings_data.json` and live in `src/app/globals.css`.
 
-## Hooking up Medusa later
+## Medusa backend
 
-1. `npm install @medusajs/js-sdk @medusajs/types` and create an SDK client with your backend URL and publishable key.
-2. Replace the bodies in `src/lib/data/products.ts` with SDK calls
-   (`sdk.store.product.list`, `sdk.store.collection.list`, …). The return shapes already match.
-3. Replace `src/lib/types.ts` with `HttpTypes.StoreProduct`, `HttpTypes.StoreCart`, etc.
-4. Swap the localStorage cart in `src/lib/cart-context.tsx` for `sdk.store.cart.*` calls.
-5. Shopify metafields (`custom.size`, `custom.material_and_care`, `custom.origin`,
-   `custom.shipping_returns`, `custom.color_group`) map to `product.metadata`.
+The storefront talks to Medusa only when both variables are set (see `.env.example`):
+
+```bash
+NEXT_PUBLIC_MEDUSA_BACKEND_URL=http://localhost:9000
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_...
+```
+
+- **Unset:** mock catalogue in `src/lib/data/mock.ts` and a localStorage cart, as before.
+- **Set:** products and collections come from the Store API via `@medusajs/js-sdk`
+  (`src/lib/data/medusa.ts`, cached for a few minutes with `"use cache"`), prices are
+  calculated for the VND region, and the cart is a real Medusa cart
+  (`sdk.store.cart.*` in `src/lib/cart-context.tsx`, cart id kept in localStorage).
+- The build needs the backend reachable when the variables are set, since pages are prerendered.
+- Shopify metafields (`custom.size`, `custom.material_and_care`, `custom.origin`,
+  `custom.shipping_returns`, `custom.color_group`) map to `product.metadata`.
+- Checkout is not built yet; the Check out button is still a placeholder.
 
 ## Placeholders / guesses
 
