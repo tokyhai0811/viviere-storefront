@@ -64,6 +64,8 @@ export type ProductMetadata = {
   material_and_care?: string
   origin?: string
   shipping_returns?: string
+  /** Display order within the catalogue (set by the backend seed). */
+  rank?: number
 }
 
 export type StoreProduct = {
