@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { CartProvider } from "@/lib/cart-context"
 import { listProducts } from "@/lib/data/products"
+import { getRegionId } from "@/lib/data/medusa"
+import { medusaEnabled } from "@/lib/medusa/client"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { CartDrawer } from "@/components/cart/cart-drawer"
@@ -22,11 +24,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { products } = await listProducts()
+  const regionId = medusaEnabled ? await getRegionId() : null
 
   return (
     <html lang="en" className="h-full">
       <body className="flex min-h-full flex-col">
-        <CartProvider>
+        <CartProvider regionId={regionId}>
           <Header products={products} />
           <main className="flex-1">{children}</main>
           <Footer />
