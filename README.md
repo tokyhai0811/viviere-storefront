@@ -46,7 +46,14 @@ NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_...
 - The build needs the backend reachable when the variables are set, since pages are prerendered.
 - Shopify metafields (`custom.size`, `custom.material_and_care`, `custom.origin`,
   `custom.shipping_returns`, `custom.color_group`) map to `product.metadata`.
-- Checkout is not built yet; the Check out button is still a placeholder.
+- Product images come from `product.images` / `thumbnail` (uploaded in the admin, stored
+  in S3) through `next/image`; products without images still show blank placeholders.
+- `/pages/<handle>` and `/policies/<handle>` read Markdown pages from the backend's
+  "Pages" admin section (`/store/pages`, `src/lib/data/pages.ts`).
+- `/checkout` is a one-page checkout (`src/components/checkout/checkout-form.tsx`):
+  address and email on the cart, shipping method, the manual test payment provider
+  (`pp_system_default`), then `cart.complete`, which creates the order and leads to
+  `/order/confirmed?id=…`.
 
 ## Placeholders / guesses
 
@@ -55,4 +62,5 @@ Not in the theme export, so invented and worth checking:
 - Prices (2.490.000 ₫ for every colour), sizes and policy text
 - Main menu (Shop / About Us / Blogs) and the footer Support menu links
 - Swatch hex for Brown, Teal and Yellow; logo rendered as a text wordmark
-- About, blog, account and policy pages are not built (they 404)
+- Blog and account pages are not built (they 404)
+- Home page banners (hero, silhouette, lifestyle shot) are still blank placeholders

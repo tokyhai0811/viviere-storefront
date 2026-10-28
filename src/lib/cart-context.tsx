@@ -13,15 +13,21 @@ import { sdk } from "@/lib/medusa/client"
 
 const STORAGE_KEY = "viviere_cart"
 const MEDUSA_CART_ID_KEY = "viviere_medusa_cart_id"
-const CART_FIELDS = "id,currency_code,item_total,subtotal,total,*items"
+export const CART_FIELDS = "id,currency_code,item_total,subtotal,shipping_total,tax_total,total,*items"
 
 type CartActions = {
   addItem: (product: StoreProduct, variant: StoreProductVariant, quantity?: number) => void
   updateQuantity: (lineId: string, quantity: number) => void
   removeItem: (lineId: string) => void
+  /** Checkout updates the cart through the SDK and hands the result back here. */
+  setCart: (cart: StoreCart) => void
+  /** Forget the cart once it has become an order. */
+  clear: () => void
 }
 
 type CartContextValue = CartActions & {
+  /** True when the cart lives in Medusa (checkout is only possible then). */
+  medusa: boolean
   cart: StoreCart
   itemCount: number
   drawerOpen: boolean
@@ -113,8 +119,11 @@ function useLocalCart(): CartActions & { cart: StoreCart } {
     setItems((prev) => prev.filter((i) => i.id !== lineId))
   }, [])
 
+  const setCart = useCallback((cart: StoreCart) => setItems(cart.items), [])
+  const clear = useCallback(() => setItems([]), [])
+
   const cart = useMemo(() => totals(items), [items])
-  return { cart, addItem, updateQuantity, removeItem }
+  return { cart, addItem, updateQuantity, removeItem, setCart, clear }
 }
 
 const toStoreCart = (cart: unknown) => cart as StoreCart
@@ -184,21 +193,31 @@ function useMedusaCart(regionId: string): CartActions & { cart: StoreCart } {
     [cart.id, removeItem],
   )
 
-  return { cart, addItem, updateQuantity, removeItem }
+  const clear = useCallback(() => {
+    try {
+      window.localStorage.removeItem(MEDUSA_CART_ID_KEY)
+    } catch {}
+    setCart(EMPTY_CART)
+  }, [])
+
+  return { cart, addItem, updateQuantity, removeItem, setCart, clear }
 }
 
 function CartContextProvider({
   state,
+  medusa,
   children,
 }: {
   state: CartActions & { cart: StoreCart }
+  medusa: boolean
   children: React.ReactNode
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const { cart, addItem, updateQuantity, removeItem } = state
+  const { cart, addItem, updateQuantity, removeItem, setCart, clear } = state
 
   const value = useMemo<CartContextValue>(
     () => ({
+      medusa,
       cart,
       itemCount: cart.items.reduce((n, i) => n + i.quantity, 0),
       drawerOpen,
@@ -210,19 +229,29 @@ function CartContextProvider({
       },
       updateQuantity,
       removeItem,
+      setCart,
+      clear,
     }),
-    [cart, drawerOpen, addItem, updateQuantity, removeItem],
+    [medusa, cart, drawerOpen, addItem, updateQuantity, removeItem, setCart, clear],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 
 function LocalCartProvider({ children }: { children: React.ReactNode }) {
-  return <CartContextProvider state={useLocalCart()}>{children}</CartContextProvider>
+  return (
+    <CartContextProvider state={useLocalCart()} medusa={false}>
+      {children}
+    </CartContextProvider>
+  )
 }
 
 function MedusaCartProvider({ regionId, children }: { regionId: string; children: React.ReactNode }) {
-  return <CartContextProvider state={useMedusaCart(regionId)}>{children}</CartContextProvider>
+  return (
+    <CartContextProvider state={useMedusaCart(regionId)} medusa>
+      {children}
+    </CartContextProvider>
+  )
 }
 
 /** `regionId` is set by the root layout only when the Medusa backend is configured. */

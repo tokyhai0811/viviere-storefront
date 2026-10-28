@@ -37,7 +37,7 @@ export function CartContents() {
               <span>{convertToLocale({ amount: cart.total, currency_code: cart.currency_code })}</span>
             </div>
             <p className="text-muted">Taxes, discounts and shipping calculated at checkout.</p>
-            <button type="button" className="btn-primary w-full">Check out</button>
+            <Link href="/checkout" className="btn-primary w-full">Check out</Link>
           </aside>
         </div>
       )}

@@ -74,7 +74,9 @@ export function CartDrawer() {
                 <span>{convertToLocale({ amount: cart.subtotal, currency_code: cart.currency_code })}</span>
               </div>
               <p className="text-muted">Taxes and shipping calculated at checkout.</p>
-              <button type="button" className="btn-primary w-full">Check out</button>
+              <Link href="/checkout" className="btn-primary w-full" onClick={closeDrawer}>
+                Check out
+              </Link>
               <Link
                 href="/cart"
                 className="block text-center uppercase underline underline-offset-2"
