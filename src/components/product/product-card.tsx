@@ -1,7 +1,7 @@
 import Link from "next/link"
 import type { StoreProduct } from "@/lib/types"
 import { convertToLocale } from "@/lib/util/money"
-import { Placeholder } from "@/components/placeholder"
+import { ProductImage, productThumbnail } from "@/components/product-image"
 
 export function productPrice(product: StoreProduct) {
   const price = product.variants[0]?.calculated_price
@@ -17,8 +17,10 @@ export function ProductCard({ product }: { product: StoreProduct }) {
   return (
     <Link href={`/products/${product.handle}`} className="group block">
       <div className="overflow-hidden">
-        <Placeholder
-          label={product.title}
+        <ProductImage
+          src={productThumbnail(product)}
+          alt={product.title}
+          sizes="(min-width: 768px) 33vw, 50vw"
           className="aspect-[4/5] w-full transition-transform duration-500 group-hover:scale-[1.02]"
         />
       </div>

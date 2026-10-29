@@ -4,7 +4,7 @@ import Link from "next/link"
 import type { StoreCartLineItem } from "@/lib/types"
 import { useCart } from "@/lib/cart-context"
 import { convertToLocale } from "@/lib/util/money"
-import { Placeholder } from "@/components/placeholder"
+import { ProductImage } from "@/components/product-image"
 import { MinusIcon, PlusIcon } from "@/components/icons"
 
 export function QuantitySelector({
@@ -52,7 +52,7 @@ export function CartLine({
   return (
     <li className="grid grid-cols-[96px_1fr] gap-4 border-b border-border py-6 md:grid-cols-[120px_1fr]">
       <Link href={href} onClick={onNavigate}>
-        <Placeholder label={item.title} className="aspect-square w-full" />
+        <ProductImage src={item.thumbnail} alt={item.title} sizes="120px" className="aspect-square w-full" />
       </Link>
       <div className="flex flex-col gap-2">
         <div className="flex items-start justify-between gap-4">

@@ -3,10 +3,10 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import type { StoreProduct } from "@/lib/types"
+import type { StoreCollection, StoreProduct } from "@/lib/types"
 import { useCart } from "@/lib/cart-context"
 import { convertToLocale } from "@/lib/util/money"
-import { Placeholder } from "@/components/placeholder"
+import { ProductImage, productThumbnail } from "@/components/product-image"
 import { AccountIcon, CartIcon, CloseIcon, MenuIcon, SearchIcon } from "@/components/icons"
 
 /**
@@ -22,7 +22,13 @@ const mainMenu = [
   { title: "Blogs", href: "/blogs/blogs" },
 ]
 
-export function Header({ products }: { products: StoreProduct[] }) {
+export function Header({
+  products,
+  collections,
+}: {
+  products: StoreProduct[]
+  collections: StoreCollection[]
+}) {
   const pathname = usePathname()
   const { itemCount, openDrawer } = useCart()
   const [scrolled, setScrolled] = useState(false)
@@ -144,17 +150,21 @@ export function Header({ products }: { products: StoreProduct[] }) {
         >
           <div className="page-width grid grid-cols-[1fr_3fr] gap-10 py-8">
             <ul className="space-y-2 text-[0.875rem] uppercase">
-              <li>
-                <Link href="/collections/all" className="hover:opacity-60">All</Link>
-              </li>
-              <li>
-                <Link href="/collections/the-bateau" className="hover:opacity-60">The Bateau</Link>
-              </li>
+              {collections.map((c) => (
+                <li key={c.id}>
+                  <Link href={`/collections/${c.handle}`} className="hover:opacity-60">{c.title}</Link>
+                </li>
+              ))}
             </ul>
             <div className="grid grid-cols-4 gap-4">
               {products.slice(0, 4).map((p) => (
                 <Link key={p.id} href={`/products/${p.handle}`} className="group">
-                  <Placeholder label={p.title} className="aspect-[4/5] w-full" />
+                  <ProductImage
+                    src={productThumbnail(p)}
+                    alt={p.title}
+                    sizes="20vw"
+                    className="aspect-[4/5] w-full"
+                  />
                   <p className="mt-2 uppercase">{p.title}</p>
                 </Link>
               ))}
@@ -245,7 +255,12 @@ function SearchModal({ products, onClose }: { products: StoreProduct[]; onClose:
           <div className="mt-3 grid grid-cols-2 gap-4 md:grid-cols-4">
             {results.map((p) => (
               <Link key={p.id} href={`/products/${p.handle}`} onClick={onClose}>
-                <Placeholder label={p.title} className="aspect-[4/5] w-full" />
+                <ProductImage
+                  src={productThumbnail(p)}
+                  alt={p.title}
+                  sizes="(min-width: 768px) 25vw, 50vw"
+                  className="aspect-[4/5] w-full"
+                />
                 <p className="mt-2 uppercase">{p.title}</p>
                 <p className="text-muted">
                   {convertToLocale({

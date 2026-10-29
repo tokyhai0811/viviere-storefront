@@ -1,20 +1,17 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { useCallback, useRef, useState } from "react"
 
 /**
  * blocks/ai_gen_block_ec3fd3e: before/after image comparison slider (16:9),
  * draggable white handle, linked labels at the bottom corners.
- * The two blank images use slightly different tones so the split stays visible.
+ * Without product images, two blank tones keep the split visible.
  */
-export function ComparisonSlider({
-  before = { label: "BLUE", href: "/products/the-bateau-blue" },
-  after = { label: "YELLOW", href: "/products/microfiber-leather-shoulder-bag-bateau-yellow" },
-}: {
-  before?: { label: string; href: string }
-  after?: { label: string; href: string }
-}) {
+type Side = { label: string; href: string; image: string | null }
+
+export function ComparisonSlider({ before, after }: { before: Side; after: Side }) {
   const [position, setPosition] = useState(50)
   const ref = useRef<HTMLDivElement>(null)
   const dragging = useRef(false)
@@ -39,13 +36,17 @@ export function ComparisonSlider({
       onPointerUp={() => (dragging.current = false)}
       onPointerCancel={() => (dragging.current = false)}
     >
-      <div role="img" aria-label={`The Bateau in ${after.label.toLowerCase()}`} className="absolute inset-0 bg-[#e4e1d8]" />
+      <div role="img" aria-label={`The Bateau in ${after.label.toLowerCase()}`} className="absolute inset-0 bg-[#e4e1d8]">
+        {after.image && <Image src={after.image} alt="" fill sizes="100vw" className="object-cover" draggable={false} />}
+      </div>
       <div
         role="img"
         aria-label={`The Bateau in ${before.label.toLowerCase()}`}
         className="absolute inset-0 bg-[#dde1e6]"
         style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
-      />
+      >
+        {before.image && <Image src={before.image} alt="" fill sizes="100vw" className="object-cover" draggable={false} />}
+      </div>
 
       {/* Divider line + handle */}
       <div className="absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white" style={{ left: `${position}%` }}>

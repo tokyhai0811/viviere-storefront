@@ -104,4 +104,7 @@ export type StoreCart = {
   item_total: number
   subtotal: number
   total: number
+  /** Set once a shipping method is chosen at checkout. */
+  shipping_total?: number
+  tax_total?: number
 }

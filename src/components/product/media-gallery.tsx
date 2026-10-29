@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import type { StoreImage } from "@/lib/types"
-import { Placeholder } from "@/components/placeholder"
+import { ProductImage } from "@/components/product-image"
 
 /**
  * blocks/_product-media-gallery: one-column stacked grid on desktop with no gap,
@@ -16,7 +16,14 @@ export function MediaGallery({ images, title }: { images: StoreImage[]; title: s
       {/* Desktop: stacked */}
       <div className="hidden flex-col gap-px md:flex">
         {images.map((img, i) => (
-          <Placeholder key={img.id} label={`${title}, image ${i + 1}`} className="aspect-[1/1.25] w-full" />
+          <ProductImage
+            key={img.id}
+            src={img.url}
+            alt={`${title}, image ${i + 1}`}
+            sizes="50vw"
+            preload={i === 0}
+            className="aspect-[1/1.25] w-full"
+          />
         ))}
       </div>
 
@@ -30,9 +37,11 @@ export function MediaGallery({ images, title }: { images: StoreImage[]; title: s
           }}
         >
           {images.map((img, i) => (
-            <Placeholder
+            <ProductImage
               key={img.id}
-              label={`${title}, image ${i + 1}`}
+              src={img.url}
+              alt={`${title}, image ${i + 1}`}
+              sizes="100vw"
               className="aspect-[1/1.25] w-full shrink-0 snap-start"
             />
           ))}

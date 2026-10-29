@@ -27,7 +27,7 @@ export async function getRegionId(): Promise<string> {
 function normalizeProduct(p: Record<string, unknown>): StoreProduct {
   const product = p as unknown as StoreProduct
   const images = product.images?.length
-    ? product.images
+    ? [...product.images].sort((x, y) => x.rank - y.rank)
     : Array.from({ length: PLACEHOLDER_IMAGE_COUNT }, (_, rank) => ({
         id: `${product.id}_placeholder_${rank}`,
         url: "",
