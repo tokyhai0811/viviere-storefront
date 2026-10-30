@@ -99,6 +99,8 @@ export type StoreCartLineItem = {
 
 export type StoreCart = {
   id: string
+  region_id?: string
+  locale?: string | null
   currency_code: string
   items: StoreCartLineItem[]
   item_total: number

@@ -13,7 +13,7 @@ import { sdk } from "@/lib/medusa/client"
 
 const STORAGE_KEY = "viviere_cart"
 const MEDUSA_CART_ID_KEY = "viviere_medusa_cart_id"
-export const CART_FIELDS = "id,currency_code,item_total,subtotal,shipping_total,tax_total,total,*items"
+export const CART_FIELDS = "id,region_id,locale,currency_code,item_total,subtotal,shipping_total,tax_total,total,*items"
 
 type CartActions = {
   addItem: (product: StoreProduct, variant: StoreProductVariant, quantity?: number) => void
@@ -128,20 +128,32 @@ function useLocalCart(): CartActions & { cart: StoreCart } {
 
 const toStoreCart = (cart: unknown) => cart as StoreCart
 
-function useMedusaCart(regionId: string): CartActions & { cart: StoreCart } {
+function useMedusaCart(regionId: string, locale: string): CartActions & { cart: StoreCart } {
   const [cart, setCart] = useState<StoreCart>(EMPTY_CART)
 
+  // Load the saved cart, and move it to this page's region and language when
+  // the visitor switched (Medusa then reprices it in that region's currency
+  // and re-translates the line titles).
   useEffect(() => {
     let id: string | null = null
     try {
       id = window.localStorage.getItem(MEDUSA_CART_ID_KEY)
     } catch {}
     if (!id) return
+    const cartId = id
     sdk.store.cart
-      .retrieve(id, { fields: CART_FIELDS })
-      .then(({ cart }) => {
+      .retrieve(cartId, { fields: `${CART_FIELDS},completed_at` })
+      .then(async ({ cart }) => {
         // A completed cart has become an order; start a fresh one next time.
         if ((cart as { completed_at?: string | null }).completed_at) throw new Error("cart completed")
+        if (cart.region_id !== regionId || (cart as { locale?: string | null }).locale !== locale) {
+          const { cart: moved } = await sdk.store.cart.update(
+            cartId,
+            { region_id: regionId, locale },
+            { fields: CART_FIELDS },
+          )
+          return setCart(toStoreCart(moved))
+        }
         setCart(toStoreCart(cart))
       })
       .catch(() => {
@@ -149,16 +161,16 @@ function useMedusaCart(regionId: string): CartActions & { cart: StoreCart } {
           window.localStorage.removeItem(MEDUSA_CART_ID_KEY)
         } catch {}
       })
-  }, [])
+  }, [regionId, locale])
 
   const ensureCartId = useCallback(async () => {
     if (cart.id) return cart.id
-    const { cart: created } = await sdk.store.cart.create({ region_id: regionId }, { fields: "id" })
+    const { cart: created } = await sdk.store.cart.create({ region_id: regionId, locale }, { fields: "id" })
     try {
       window.localStorage.setItem(MEDUSA_CART_ID_KEY, created.id)
     } catch {}
     return created.id
-  }, [cart.id, regionId])
+  }, [cart.id, regionId, locale])
 
   const addItem = useCallback(
     (_product: StoreProduct, variant: StoreProductVariant, quantity = 1) => {
@@ -246,18 +258,37 @@ function LocalCartProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-function MedusaCartProvider({ regionId, children }: { regionId: string; children: React.ReactNode }) {
+function MedusaCartProvider({
+  regionId,
+  locale,
+  children,
+}: {
+  regionId: string
+  locale: string
+  children: React.ReactNode
+}) {
   return (
-    <CartContextProvider state={useMedusaCart(regionId)} medusa>
+    <CartContextProvider state={useMedusaCart(regionId, locale)} medusa>
       {children}
     </CartContextProvider>
   )
 }
 
-/** `regionId` is set by the root layout only when the Medusa backend is configured. */
-export function CartProvider({ regionId, children }: { regionId: string | null; children: React.ReactNode }) {
+/**
+ * `regionId` is set by the root layout only when the Medusa backend is
+ * configured; `locale` is the page language, so cart lines are translated.
+ */
+export function CartProvider({
+  regionId,
+  locale,
+  children,
+}: {
+  regionId: string | null
+  locale: string
+  children: React.ReactNode
+}) {
   return regionId ? (
-    <MedusaCartProvider regionId={regionId}>{children}</MedusaCartProvider>
+    <MedusaCartProvider regionId={regionId} locale={locale}>{children}</MedusaCartProvider>
   ) : (
     <LocalCartProvider>{children}</LocalCartProvider>
   )

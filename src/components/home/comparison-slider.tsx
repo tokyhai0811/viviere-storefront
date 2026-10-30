@@ -1,8 +1,9 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/components/link"
 import { useCallback, useRef, useState } from "react"
+import { useI18n } from "@/lib/i18n/client"
 
 /**
  * blocks/ai_gen_block_ec3fd3e: before/after image comparison slider (16:9),
@@ -12,6 +13,7 @@ import { useCallback, useRef, useState } from "react"
 type Side = { label: string; href: string; image: string | null }
 
 export function ComparisonSlider({ before, after }: { before: Side; after: Side }) {
+  const { t } = useI18n()
   const [position, setPosition] = useState(50)
   const ref = useRef<HTMLDivElement>(null)
   const dragging = useRef(false)
@@ -36,12 +38,12 @@ export function ComparisonSlider({ before, after }: { before: Side; after: Side 
       onPointerUp={() => (dragging.current = false)}
       onPointerCancel={() => (dragging.current = false)}
     >
-      <div role="img" aria-label={`The Bateau in ${after.label.toLowerCase()}`} className="absolute inset-0 bg-[#e4e1d8]">
+      <div role="img" aria-label={t.home.bateauIn(after.label.toLowerCase())} className="absolute inset-0 bg-[#e4e1d8]">
         {after.image && <Image src={after.image} alt="" fill sizes="100vw" className="object-cover" draggable={false} />}
       </div>
       <div
         role="img"
-        aria-label={`The Bateau in ${before.label.toLowerCase()}`}
+        aria-label={t.home.bateauIn(before.label.toLowerCase())}
         className="absolute inset-0 bg-[#dde1e6]"
         style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
       >
@@ -53,7 +55,7 @@ export function ComparisonSlider({ before, after }: { before: Side; after: Side 
         <div
           role="slider"
           tabIndex={0}
-          aria-label="Compare colours"
+          aria-label={t.home.compare}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(position)}

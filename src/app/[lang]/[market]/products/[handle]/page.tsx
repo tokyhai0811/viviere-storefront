@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import { Link } from "@/components/link"
 import { notFound } from "next/navigation"
-import { getProductByHandle, listColorSiblings, listProducts } from "@/lib/data/products"
+import { getProductByHandle, listColorSiblings, listProducts, metaText } from "@/lib/data/products"
+import { LANG_LOCALE, localizePath } from "@/lib/i18n/config"
+import { getDictionary, getLang } from "@/lib/i18n/server"
 import { productPrice } from "@/components/product/product-card"
 import { MediaGallery } from "@/components/product/media-gallery"
 import { AddToCart } from "@/components/product/add-to-cart"
@@ -10,8 +12,8 @@ import { CraftedSection } from "@/components/product/crafted-section"
 
 /**
  * templates/product.json: equal columns, media left (full bleed), sticky
- * details right. Title and price in Montserrat, VAT note, colour swatches
- * linking sibling products, description, add to cart, accordion of metafields.
+ * details right. Title and price in Montserrat, colour swatches linking
+ * sibling products, description, add to cart, accordion of metafields.
  */
 
 export async function generateStaticParams() {
@@ -19,19 +21,26 @@ export async function generateStaticParams() {
   return products.map((p) => ({ handle: p.handle }))
 }
 
-export async function generateMetadata({ params }: PageProps<"/products/[handle]">): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/[lang]/[market]/products/[handle]">): Promise<Metadata> {
   const { handle } = await params
-  const product = await getProductByHandle(handle)
-  return { title: product?.title ?? "Product", description: product?.description ?? undefined }
+  const [product, t] = await Promise.all([getProductByHandle(handle), getDictionary()])
+  return {
+    title: product?.title ?? t.meta.product,
+    description: product?.description ?? undefined,
+    // The same product in the other language.
+    alternates: {
+      languages: { en: `/products/${handle}`, vi: localizePath("vi", `/products/${handle}`) },
+    },
+  }
 }
 
-export default async function ProductPage({ params }: PageProps<"/products/[handle]">) {
+export default async function ProductPage({ params }: PageProps<"/[lang]/[market]/products/[handle]">) {
   const { handle } = await params
   const product = await getProductByHandle(handle)
   if (!product) notFound()
 
-  const siblings = await listColorSiblings(product)
-  const meta = product.metadata ?? {}
+  const [siblings, t, lang] = await Promise.all([listColorSiblings(product), getDictionary(), getLang()])
+  const meta = (key: Parameters<typeof metaText>[1]) => metaText(product, key, lang)
 
   return (
     <>
@@ -44,14 +53,13 @@ export default async function ProductPage({ params }: PageProps<"/products/[hand
           <div className="flex flex-col gap-3 pt-5 pb-10 md:sticky md:top-20 md:max-w-[480px]">
             <div className="flex items-start justify-between gap-3">
               <h1 className="w-[65%] font-accent text-[0.875rem] font-semibold">{product.title}</h1>
-              <p className="w-[30%] text-right font-accent text-[0.875rem]">{productPrice(product)}</p>
+              <p className="w-[30%] text-right font-accent text-[0.875rem]">{productPrice(product, LANG_LOCALE[lang])}</p>
             </div>
-            <p className="text-right text-[0.75rem] text-black/55">Price will be converted to VND at checkout</p>
             <hr className="border-border" />
 
             {siblings.length > 0 && (
               <div className="mt-2">
-                <span className="mb-1.5 block text-[14px]">Color</span>
+                <span className="mb-1.5 block text-[14px]">{t.product.color}</span>
                 <div className="flex gap-3">
                   {siblings.map((s) => {
                     const active = s.id === product.id
@@ -81,17 +89,17 @@ export default async function ProductPage({ params }: PageProps<"/products/[hand
 
             <Accordion
               rows={[
-                { heading: "Size", content: meta.size },
-                { heading: "Material", content: meta.material_and_care },
-                { heading: "Origin", content: meta.origin },
-                { heading: "Shipping & Returns", content: meta.shipping_returns },
+                { heading: t.product.size, content: meta("size") },
+                { heading: t.product.material, content: meta("material_and_care") },
+                { heading: t.product.origin, content: meta("origin") },
+                { heading: t.product.shippingReturns, content: meta("shipping_returns") },
               ]}
             />
           </div>
         </div>
       </section>
 
-      <CraftedSection />
+      <CraftedSection t={t} />
     </>
   )
 }

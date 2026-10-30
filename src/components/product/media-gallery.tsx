@@ -3,12 +3,14 @@
 import { useState } from "react"
 import type { StoreImage } from "@/lib/types"
 import { ProductImage } from "@/components/product-image"
+import { useI18n } from "@/lib/i18n/client"
 
 /**
  * blocks/_product-media-gallery: one-column stacked grid on desktop with no gap,
  * 1/1.25 aspect ratio; swipeable slideshow with dots on mobile.
  */
 export function MediaGallery({ images, title }: { images: StoreImage[]; title: string }) {
+  const { t } = useI18n()
   const [active, setActive] = useState(0)
 
   return (
@@ -19,7 +21,7 @@ export function MediaGallery({ images, title }: { images: StoreImage[]; title: s
           <ProductImage
             key={img.id}
             src={img.url}
-            alt={`${title}, image ${i + 1}`}
+            alt={t.product.imageAlt(title, i + 1)}
             sizes="50vw"
             preload={i === 0}
             className="aspect-[1/1.25] w-full"
@@ -40,7 +42,7 @@ export function MediaGallery({ images, title }: { images: StoreImage[]; title: s
             <ProductImage
               key={img.id}
               src={img.url}
-              alt={`${title}, image ${i + 1}`}
+              alt={t.product.imageAlt(title, i + 1)}
               sizes="100vw"
               className="aspect-[1/1.25] w-full shrink-0 snap-start"
             />
