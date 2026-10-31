@@ -11,7 +11,7 @@ export type StorePage = {
   id: string
   handle: string
   title: string
-  /** Markdown. */
+  /** HTML from the admin editor, or Markdown for older pages. See renderRichText. */
   body: string
 }
 
