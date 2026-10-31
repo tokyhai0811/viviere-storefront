@@ -7,7 +7,7 @@ import type { StoreCollection, StoreProduct } from "@/lib/types"
  */
 
 export const CURRENCY_CODE = "vnd"
-const PLACEHOLDER_PRICE = 2_490_000
+const PLACEHOLDER_PRICE = 1_860_000
 
 export const collections: StoreCollection[] = [
   { id: "pcol_all", title: "All", handle: "all" },

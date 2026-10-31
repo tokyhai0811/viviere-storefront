@@ -1,4 +1,5 @@
-import type { StoreCollection, StoreProduct } from "@/lib/types"
+import type { ProductMetadata, StoreCollection, StoreProduct } from "@/lib/types"
+import type { Lang } from "@/lib/i18n/config"
 import { medusaEnabled } from "@/lib/medusa/client"
 import { collections as mockCollections, products as mockProducts } from "./mock"
 import { medusaListCollections, medusaListProducts } from "./medusa"
@@ -40,6 +41,24 @@ export async function listColorSiblings(product: StoreProduct): Promise<StorePro
   if (!group) return []
   return (await allProducts()).filter((p) => p.metadata?.color_group === group)
 }
+
+/**
+ * A text metafield in `lang`. Medusa translates core fields but not metadata,
+ * so other languages live next to the English value with a suffix, e.g.
+ * `material_and_care_vi` (editable as a custom field in Bulk edit).
+ */
+export function metaText(
+  product: StoreProduct,
+  key: "size" | "material_and_care" | "origin" | "shipping_returns" | "color",
+  lang: Lang,
+): string | undefined {
+  const meta = (product.metadata ?? {}) as ProductMetadata & Record<string, unknown>
+  const localized = lang === "en" ? undefined : meta[`${key}_${lang}`]
+  return typeof localized === "string" && localized ? localized : meta[key]
+}
+
+/** Short colour name for labels: the (translated) subtitle, else the English metadata colour. */
+export const colorLabel = (product: StoreProduct) => product.subtitle || product.metadata?.color || product.title
 
 export async function listCollections(): Promise<StoreCollection[]> {
   if (!medusaEnabled) return mockCollections

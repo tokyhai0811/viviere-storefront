@@ -1,10 +1,12 @@
 "use client"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { Link } from "@/components/link"
+import { useSearchParams } from "next/navigation"
+import { Suspense, useEffect, useState } from "react"
 import type { StoreCollection, StoreProduct } from "@/lib/types"
 import { useCart } from "@/lib/cart-context"
+import { usePagePath, useI18n } from "@/lib/i18n/client"
+import { LANG_COOKIE, MARKETS, MARKET_COOKIE, localizePath, type Lang, type Market } from "@/lib/i18n/config"
 import { convertToLocale } from "@/lib/util/money"
 import { ProductImage, productThumbnail } from "@/components/product-image"
 import { AccountIcon, CartIcon, CloseIcon, MenuIcon, SearchIcon } from "@/components/icons"
@@ -15,12 +17,62 @@ import { AccountIcon, CartIcon, CloseIcon, MenuIcon, SearchIcon } from "@/compon
  * (inverted, white text) and on product pages (default colours).
  */
 
-// The live main-menu is managed in Shopify admin and is not in the theme export.
-const mainMenu = [
-  { title: "Shop", href: "/collections/all", featured: true },
-  { title: "About Us", href: "/pages/about-us" },
-  { title: "Blogs", href: "/blogs/blogs" },
-]
+const YEAR = 60 * 60 * 24 * 365
+const setCookie = (name: string, value: string) => {
+  document.cookie = `${name}=${value}; path=/; max-age=${YEAR}; samesite=lax`
+}
+
+/**
+ * Language and country pickers. Language changes the URL (/vi/...); the
+ * country picks the market (currency), saved in a cookie the proxy reads.
+ */
+function LocaleSwitchers({ className = "" }: { className?: string }) {
+  const path = usePagePath()
+  const search = useSearchParams().toString()
+  const { lang, market, t } = useI18n()
+
+  // Language and market are the root layout's segments, so a switch is a full
+  // page load: client-side navigation can't swap the root layout in place.
+  const switchLang = (next: Lang) => {
+    // Saved first, so the proxy doesn't send a Vietnamese browser back to /vi.
+    setCookie(LANG_COOKIE, next)
+    window.location.assign(localizePath(next, path) + (search ? `?${search}` : ""))
+  }
+  const switchMarket = (next: Market) => {
+    setCookie(MARKET_COOKIE, next)
+    window.location.reload()
+  }
+
+  return (
+    <div className={`flex items-center gap-3 ${className}`}>
+      <label className="flex items-center">
+        <span className="sr-only">{t.nav.region}</span>
+        <select
+          className="cursor-pointer bg-transparent text-[12px] uppercase outline-none"
+          value={market}
+          onChange={(e) => switchMarket(e.target.value as Market)}
+        >
+          {MARKETS.map((m) => (
+            <option key={m} value={m} className="text-black">
+              {t.markets[m]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex items-center">
+        <span className="sr-only">{t.nav.language}</span>
+        <select
+          className="cursor-pointer bg-transparent text-[12px] uppercase outline-none"
+          value={lang}
+          onChange={(e) => switchLang(e.target.value as Lang)}
+        >
+          <option value="en" className="text-black">English</option>
+          <option value="vi" className="text-black">Tiếng Việt</option>
+        </select>
+      </label>
+    </div>
+  )
+}
 
 export function Header({
   products,
@@ -29,8 +81,15 @@ export function Header({
   products: StoreProduct[]
   collections: StoreCollection[]
 }) {
-  const pathname = usePathname()
+  const pathname = usePagePath()
+  const { t } = useI18n()
   const { itemCount, openDrawer } = useCart()
+  // The live main-menu is managed in Shopify admin and is not in the theme export.
+  const mainMenu = [
+    { title: t.nav.shop, href: "/collections/all", featured: true },
+    { title: t.nav.aboutUs, href: "/pages/about-us" },
+    { title: t.nav.blogs, href: "/blogs/blogs" },
+  ]
   const [scrolled, setScrolled] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -69,7 +128,7 @@ export function Header({
             <button
               type="button"
               className="-ml-2 p-2 md:hidden"
-              aria-label="Open menu"
+              aria-label={t.nav.openMenu}
               onClick={() => setDrawerOpen(true)}
             >
               <MenuIcon />
@@ -94,38 +153,32 @@ export function Header({
           <Link
             href="/"
             className="font-accent text-[1.375rem] font-light tracking-[0.35em] md:text-[1.75rem]"
-            aria-label="VIVIÈRE home"
+            aria-label={t.nav.home}
           >
             VIVIÈRE
           </Link>
 
           {/* Right: localization, search, account, cart */}
           <div className="flex items-center justify-end gap-1 md:gap-3">
-            <label className="hidden items-center md:flex">
-              <span className="sr-only">Language</span>
-              <select
-                className="cursor-pointer bg-transparent text-[12px] uppercase outline-none"
-                defaultValue="en"
-              >
-                <option value="en" className="text-black">English</option>
-                <option value="vi" className="text-black">Tiếng Việt</option>
-              </select>
-            </label>
+            {/* useSearchParams needs a Suspense boundary on prerendered pages. */}
+            <Suspense>
+              <LocaleSwitchers className="hidden md:flex" />
+            </Suspense>
             <button
               type="button"
               className="p-2"
-              aria-label="Search"
+              aria-label={t.nav.search}
               onClick={() => setSearchOpen(true)}
             >
               <SearchIcon />
             </button>
-            <Link href="/account" className="hidden p-2 md:block" aria-label="Account">
+            <Link href="/account" className="hidden p-2 md:block" aria-label={t.nav.account}>
               <AccountIcon />
             </Link>
             <button
               type="button"
               className="relative -mr-2 p-2"
-              aria-label={`Cart, ${itemCount} items`}
+              aria-label={t.nav.cartCount(itemCount)}
               onClick={openDrawer}
             >
               <CartIcon />
@@ -193,7 +246,7 @@ export function Header({
           <button
             type="button"
             className="-ml-2 self-start p-2"
-            aria-label="Close menu"
+            aria-label={t.nav.closeMenu}
             onClick={() => setDrawerOpen(false)}
           >
             <CloseIcon />
@@ -207,12 +260,11 @@ export function Header({
           </ul>
           <div className="mt-auto flex items-center justify-between border-t border-border pt-4">
             <Link href="/account" className="flex items-center gap-2 uppercase">
-              <AccountIcon className="size-4" /> Account
+              <AccountIcon className="size-4" /> {t.nav.account}
             </Link>
-            <select className="bg-transparent text-[12px] uppercase" defaultValue="en">
-              <option value="en">English</option>
-              <option value="vi">Tiếng Việt</option>
-            </select>
+            <Suspense>
+              <LocaleSwitchers className="flex-col items-end gap-2" />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -223,6 +275,7 @@ export function Header({
 }
 
 function SearchModal({ products, onClose }: { products: StoreProduct[]; onClose: () => void }) {
+  const { t, locale } = useI18n()
   const [query, setQuery] = useState("")
   const q = query.trim().toLowerCase()
   const results = q ? products.filter((p) => p.title.toLowerCase().includes(q)) : products.slice(0, 4)
@@ -234,7 +287,7 @@ function SearchModal({ products, onClose }: { products: StoreProduct[]; onClose:
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Search">
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={t.nav.search}>
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white">
         <div className="page-width py-6">
@@ -244,14 +297,14 @@ function SearchModal({ products, onClose }: { products: StoreProduct[]; onClose:
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search"
+              placeholder={t.nav.search}
               className="flex-1 bg-transparent text-[0.875rem] outline-none"
             />
-            <button type="button" aria-label="Close search" onClick={onClose}>
+            <button type="button" aria-label={t.nav.closeSearch} onClick={onClose}>
               <CloseIcon />
             </button>
           </div>
-          <p className="mt-5 uppercase text-muted">{q ? `Products (${results.length})` : "Suggested"}</p>
+          <p className="mt-5 uppercase text-muted">{q ? t.nav.productsCount(results.length) : t.nav.suggested}</p>
           <div className="mt-3 grid grid-cols-2 gap-4 md:grid-cols-4">
             {results.map((p) => (
               <Link key={p.id} href={`/products/${p.handle}`} onClick={onClose}>
@@ -266,6 +319,7 @@ function SearchModal({ products, onClose }: { products: StoreProduct[]; onClose:
                   {convertToLocale({
                     amount: p.variants[0].calculated_price.calculated_amount,
                     currency_code: p.variants[0].calculated_price.currency_code,
+                    locale,
                   })}
                 </p>
               </Link>

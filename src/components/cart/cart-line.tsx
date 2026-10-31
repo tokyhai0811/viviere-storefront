@@ -1,8 +1,9 @@
 "use client"
 
-import Link from "next/link"
+import { Link } from "@/components/link"
 import type { StoreCartLineItem } from "@/lib/types"
 import { useCart } from "@/lib/cart-context"
+import { useI18n } from "@/lib/i18n/client"
 import { convertToLocale } from "@/lib/util/money"
 import { ProductImage } from "@/components/product-image"
 import { MinusIcon, PlusIcon } from "@/components/icons"
@@ -14,12 +15,13 @@ export function QuantitySelector({
   value: number
   onChange: (next: number) => void
 }) {
+  const { t } = useI18n()
   return (
     <div className="inline-flex h-9 items-center border border-[#00000021]">
       <button
         type="button"
         className="flex h-full w-9 items-center justify-center hover:bg-[#f5f5f5]"
-        aria-label="Decrease quantity"
+        aria-label={t.cart.decrease}
         onClick={() => onChange(value - 1)}
       >
         <MinusIcon />
@@ -28,7 +30,7 @@ export function QuantitySelector({
       <button
         type="button"
         className="flex h-full w-9 items-center justify-center hover:bg-[#f5f5f5]"
-        aria-label="Increase quantity"
+        aria-label={t.cart.increase}
         onClick={() => onChange(value + 1)}
       >
         <PlusIcon />
@@ -47,6 +49,7 @@ export function CartLine({
   onNavigate?: () => void
 }) {
   const { updateQuantity, removeItem } = useCart()
+  const { t, locale } = useI18n()
   const href = `/products/${item.product_handle}`
 
   return (
@@ -60,10 +63,10 @@ export function CartLine({
             <Link href={href} onClick={onNavigate} className="uppercase hover:opacity-60">
               {item.title}
             </Link>
-            {item.subtitle && <p className="text-muted">Color: {item.subtitle}</p>}
+            {item.subtitle && <p className="text-muted">{t.cart.colorLine(item.subtitle)}</p>}
           </div>
           <p className="whitespace-nowrap">
-            {convertToLocale({ amount: item.total, currency_code: currencyCode })}
+            {convertToLocale({ amount: item.total, currency_code: currencyCode, locale })}
           </p>
         </div>
         <div className="mt-auto flex items-center gap-4">
@@ -73,7 +76,7 @@ export function CartLine({
             className="text-muted underline underline-offset-2 hover:text-black"
             onClick={() => removeItem(item.id)}
           >
-            Remove
+            {t.cart.remove}
           </button>
         </div>
       </div>

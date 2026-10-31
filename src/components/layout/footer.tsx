@@ -1,15 +1,7 @@
-import Link from "next/link"
+import { Link } from "@/components/link"
+import { getDictionary } from "@/lib/i18n/server"
 
 /** Footer from sections/footer-group.json (color scheme 5: black background). */
-
-// footer-menu-2 lives in Shopify admin; these are typical Support links.
-const supportMenu = [
-  { title: "Shipping Policy", href: "/policies/shipping-policy" },
-  { title: "Refund Policy", href: "/policies/refund-policy" },
-  { title: "Privacy Policy", href: "/policies/privacy-policy" },
-  { title: "Terms of Service", href: "/policies/terms-of-service" },
-  { title: "Contact", href: "/pages/contact" },
-]
 
 const social = [
   { title: "Facebook", href: "https://www.facebook.com/viviere.official" },
@@ -17,29 +9,39 @@ const social = [
   { title: "TikTok", href: "https://www.tiktok.com/@viviere.official" },
 ]
 
-export function Footer() {
+export async function Footer() {
+  const t = await getDictionary()
+  // footer-menu-2 lives in Shopify admin; these are typical Support links.
+  const supportMenu = [
+    { title: t.footer.shippingPolicy, href: "/policies/shipping-policy" },
+    { title: t.footer.refundPolicy, href: "/policies/refund-policy" },
+    { title: t.footer.privacyPolicy, href: "/policies/privacy-policy" },
+    { title: t.footer.termsOfService, href: "/policies/terms-of-service" },
+    { title: t.footer.contact, href: "/pages/contact" },
+  ]
+
   return (
     <footer className="mt-auto bg-black text-white">
       <div className="page-width grid gap-12 py-14 text-center md:grid-cols-3 md:py-16">
         <div className="space-y-2">
-          <h3 className="type-h3 italic">Contact us</h3>
+          <h3 className="type-h3 italic">{t.footer.contactUs}</h3>
           <p>
-            Email:{" "}
+            {t.footer.email}:{" "}
             <a href="mailto:hello@viviere.vn" className="link-underline">
               hello@viviere.vn
             </a>
           </p>
-          <h3 className="type-h3 pt-8 italic">Company</h3>
+          <h3 className="type-h3 pt-8 italic">{t.footer.company}</h3>
           <p>
-            <Link href="/pages/about-us" className="hover:opacity-60">About Us</Link>
+            <Link href="/pages/about-us" className="hover:opacity-60">{t.nav.aboutUs}</Link>
           </p>
           <p>
-            <Link href="/blogs/blogs" className="hover:opacity-60">Blogs</Link>
+            <Link href="/blogs/blogs" className="hover:opacity-60">{t.nav.blogs}</Link>
           </p>
         </div>
 
         <div className="space-y-2">
-          <h3 className="type-h3">Support</h3>
+          <h3 className="type-h3">{t.footer.support}</h3>
           <ul className="space-y-2">
             {supportMenu.map((item) => (
               <li key={item.href}>
@@ -50,7 +52,7 @@ export function Footer() {
         </div>
 
         <div className="space-y-2">
-          <h3 className="type-h3">Follow us</h3>
+          <h3 className="type-h3">{t.footer.followUs}</h3>
           <ul className="space-y-2">
             {social.map((s) => (
               <li key={s.href}>

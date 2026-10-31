@@ -1,5 +1,6 @@
-import Link from "next/link"
+import { Link } from "@/components/link"
 import type { StoreProduct } from "@/lib/types"
+import { colorLabel } from "@/lib/data/products"
 import { Placeholder } from "@/components/placeholder"
 import { ProductImage, productThumbnail } from "@/components/product-image"
 
@@ -17,7 +18,7 @@ export function ColorGallery({ products }: { products: StoreProduct[] }) {
         <Placeholder label="The Bateau lifestyle" className="aspect-square w-full md:aspect-auto md:h-full" />
         <div className="grid grid-cols-2 gap-5">
           {products.slice(0, 4).map((p) => {
-            const label = (p.metadata?.color ?? p.title).toUpperCase()
+            const label = colorLabel(p).toUpperCase()
             return (
               <Link key={p.id} href={`/products/${p.handle}`} className="group block">
                 <ProductImage
