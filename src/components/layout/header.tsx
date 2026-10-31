@@ -1,7 +1,7 @@
 "use client"
 
 import { Link } from "@/components/link"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useState } from "react"
 import type { StoreCollection, StoreProduct } from "@/lib/types"
 import { useCart } from "@/lib/cart-context"
@@ -84,12 +84,8 @@ export function Header({
   const pathname = usePagePath()
   const { t } = useI18n()
   const { itemCount, openDrawer } = useCart()
-  // The live main-menu is managed in Shopify admin and is not in the theme export.
-  const mainMenu = [
-    { title: t.nav.shop, href: "/collections/all", featured: true },
-    { title: t.nav.aboutUs, href: "/pages/about-us" },
-    { title: t.nav.blogs, href: "/blogs/blogs" },
-  ]
+  // viviere.vn's main menu has a single link; About Us and Blogs are in the footer.
+  const mainMenu = [{ title: t.nav.shop, href: "/collections/all", featured: true }]
   const [scrolled, setScrolled] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -275,7 +271,8 @@ export function Header({
 }
 
 function SearchModal({ products, onClose }: { products: StoreProduct[]; onClose: () => void }) {
-  const { t, locale } = useI18n()
+  const { t, locale, href } = useI18n()
+  const router = useRouter()
   const [query, setQuery] = useState("")
   const q = query.trim().toLowerCase()
   const results = q ? products.filter((p) => p.title.toLowerCase().includes(q)) : products.slice(0, 4)
@@ -291,7 +288,16 @@ function SearchModal({ products, onClose }: { products: StoreProduct[]; onClose:
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative bg-white">
         <div className="page-width py-6">
-          <div className="flex items-center gap-3 border-b border-black pb-2">
+          <form
+            role="search"
+            className="flex items-center gap-3 border-b border-black pb-2"
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (!q) return
+              onClose()
+              router.push(href(`/search?q=${encodeURIComponent(query.trim())}`))
+            }}
+          >
             <SearchIcon className="size-4" />
             <input
               autoFocus
@@ -303,8 +309,17 @@ function SearchModal({ products, onClose }: { products: StoreProduct[]; onClose:
             <button type="button" aria-label={t.nav.closeSearch} onClick={onClose}>
               <CloseIcon />
             </button>
+          </form>
+          <div className="mt-5 flex items-center justify-between">
+            <p className="uppercase text-muted">{q ? t.nav.productsCount(results.length) : t.nav.suggested}</p>
+            <Link
+              href={q ? `/search?q=${encodeURIComponent(query.trim())}` : "/collections/all"}
+              onClick={onClose}
+              className="link-underline uppercase"
+            >
+              {t.nav.viewAll}
+            </Link>
           </div>
-          <p className="mt-5 uppercase text-muted">{q ? t.nav.productsCount(results.length) : t.nav.suggested}</p>
           <div className="mt-3 grid grid-cols-2 gap-4 md:grid-cols-4">
             {results.map((p) => (
               <Link key={p.id} href={`/products/${p.handle}`} onClick={onClose}>

@@ -26,7 +26,11 @@ export default async function CollectionPage({ params }: PageProps<"/[lang]/[mar
   const collection = await getCollectionByHandle(handle)
   if (!collection) notFound()
 
-  const [{ products }, lang] = await Promise.all([listProducts({ collection_id: collection.id }), getLang()])
+  const [{ products }, lang, t] = await Promise.all([
+    listProducts({ collection_id: collection.id }),
+    getLang(),
+    getDictionary(),
+  ])
 
   return (
     <section className="page-width pt-6 pb-[66px] md:pt-10">
@@ -34,7 +38,7 @@ export default async function CollectionPage({ params }: PageProps<"/[lang]/[mar
       <ul className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-5">
         {products.map((p) => (
           <li key={p.id}>
-            <ProductCard product={p} locale={LANG_LOCALE[lang]} />
+            <ProductCard product={p} locale={LANG_LOCALE[lang]} t={t} />
           </li>
         ))}
       </ul>

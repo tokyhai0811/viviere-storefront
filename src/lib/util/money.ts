@@ -8,6 +8,8 @@ export function convertToLocale({
   currency_code: string
   locale?: string
 }) {
+  // viviere.vn writes đồng the Vietnamese way (1.836.000 ₫) in both languages.
+  if (currency_code.toLowerCase() === "vnd") locale = "vi-VN"
   // Whole amounts show without decimals ($95, 2.490.000 ₫); cents only when present.
   return new Intl.NumberFormat(locale, {
     style: "currency",

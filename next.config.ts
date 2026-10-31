@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ protocol: "https", hostname: "**.amazonaws.com" }, ...backendImages()],
   },
   partialPrefetching: true,
+  // viviere.vn's product handles changed from the-bateau-<colour>; its home
+  // page still links the old ones, and Shopify redirects them.
+  async redirects() {
+    const color = ":color(burgundy|brown|teal|black|blue|yellow)"
+    return ["", "/vi"].map((prefix) => ({
+      source: `${prefix}/products/the-bateau-${color}`,
+      destination: `${prefix}/products/microfiber-leather-shoulder-bag-bateau-:color`,
+      permanent: true,
+    }))
+  },
   turbopack: {
     rules: {
       "*.css": {

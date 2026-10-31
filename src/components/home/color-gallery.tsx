@@ -7,7 +7,7 @@ import { ProductImage, productThumbnail } from "@/components/product-image"
 /**
  * blocks/ai_gen_block_499fd59: two columns, a large image on the left and a
  * 2×2 grid of square colour shots with centred labels on the right. The tiles
- * are the first four products in catalogue order.
+ * are the first four products given (the home page picks them).
  */
 export function ColorGallery({ products }: { products: StoreProduct[] }) {
   if (!products.length) return null

@@ -3,7 +3,7 @@ import { Link } from "@/components/link"
 import { notFound } from "next/navigation"
 import { getProductByHandle, listColorSiblings, listProducts, metaText } from "@/lib/data/products"
 import { LANG_LOCALE, localizePath } from "@/lib/i18n/config"
-import { getDictionary, getLang } from "@/lib/i18n/server"
+import { getDictionary, getLang, getMarket } from "@/lib/i18n/server"
 import { productPrice } from "@/components/product/product-card"
 import { MediaGallery } from "@/components/product/media-gallery"
 import { AddToCart } from "@/components/product/add-to-cart"
@@ -39,7 +39,12 @@ export default async function ProductPage({ params }: PageProps<"/[lang]/[market
   const product = await getProductByHandle(handle)
   if (!product) notFound()
 
-  const [siblings, t, lang] = await Promise.all([listColorSiblings(product), getDictionary(), getLang()])
+  const [siblings, t, lang, market] = await Promise.all([
+    listColorSiblings(product),
+    getDictionary(),
+    getLang(),
+    getMarket(),
+  ])
   const meta = (key: Parameters<typeof metaText>[1]) => metaText(product, key, lang)
 
   return (
@@ -55,6 +60,11 @@ export default async function ProductPage({ params }: PageProps<"/[lang]/[market
               <h1 className="w-[65%] font-accent text-[0.875rem] font-semibold">{product.title}</h1>
               <p className="w-[30%] text-right font-accent text-[0.875rem]">{productPrice(product, LANG_LOCALE[lang])}</p>
             </div>
+            {/* viviere.vn: "Price includes VAT. Free shipping within Vietnam." */}
+            <p className="-mt-1 text-[0.75rem] text-muted">
+              {t.product.taxIncluded}
+              {market === "vn" && ` ${t.product.freeShippingVn}`}
+            </p>
             <hr className="border-border" />
 
             {siblings.length > 0 && (
