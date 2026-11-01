@@ -26,7 +26,7 @@ export default async function CartPage() {
         <ul className="grid grid-cols-2 gap-x-[26px] gap-y-9 md:grid-cols-4">
           {products.map((p) => (
             <li key={p.id}>
-              <ProductCard product={p} locale={LANG_LOCALE[lang]} />
+              <ProductCard product={p} locale={LANG_LOCALE[lang]} t={t} />
             </li>
           ))}
         </ul>

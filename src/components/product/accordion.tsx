@@ -10,7 +10,7 @@ export function Accordion({ rows }: { rows: { heading: string; content?: string 
             <span>{row.heading}</span>
             <CaretIcon className="size-3.5 transition-transform group-open:rotate-180" />
           </summary>
-          <p className="pb-4 text-[0.875rem] leading-relaxed">{row.content}</p>
+          <p className="whitespace-pre-line pb-4 text-[0.875rem] leading-relaxed">{row.content}</p>
         </details>
       ))}
     </div>

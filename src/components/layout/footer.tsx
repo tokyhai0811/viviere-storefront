@@ -1,7 +1,10 @@
 import { Link } from "@/components/link"
 import { getDictionary } from "@/lib/i18n/server"
 
-/** Footer from sections/footer-group.json (color scheme 5: black background). */
+/**
+ * Footer from sections/footer-group.json (color scheme 5: black background),
+ * with the menus, contact details and company details of viviere.vn.
+ */
 
 const social = [
   { title: "Facebook", href: "https://www.facebook.com/viviere.official" },
@@ -11,10 +14,11 @@ const social = [
 
 export async function Footer() {
   const t = await getDictionary()
-  // footer-menu-2 lives in Shopify admin; these are typical Support links.
+  // viviere.vn's footer-menu-2 ("Support"), in its order.
   const supportMenu = [
-    { title: t.footer.shippingPolicy, href: "/policies/shipping-policy" },
     { title: t.footer.refundPolicy, href: "/policies/refund-policy" },
+    { title: t.footer.shippingPolicy, href: "/policies/shipping-policy" },
+    { title: t.footer.paymentPolicy, href: "/pages/payment-policy" },
     { title: t.footer.privacyPolicy, href: "/policies/privacy-policy" },
     { title: t.footer.termsOfService, href: "/policies/terms-of-service" },
     { title: t.footer.contact, href: "/pages/contact" },
@@ -30,6 +34,13 @@ export async function Footer() {
             <a href="mailto:hello@viviere.vn" className="link-underline">
               hello@viviere.vn
             </a>
+          </p>
+          <p>
+            {t.footer.phone}:{" "}
+            <a href="tel:+84352122093" className="link-underline">
+              {t.footer.phoneNumber}
+            </a>{" "}
+            ({t.footer.hours})
           </p>
           <h3 className="type-h3 pt-8 italic">{t.footer.company}</h3>
           <p>
@@ -65,8 +76,11 @@ export async function Footer() {
         </div>
       </div>
 
-      <div className="page-width border-t border-[#666666] py-5 text-center text-[0.75rem] uppercase">
-        © 2026 VIVIÈRE
+      <div className="page-width border-t border-[#666666] py-6 text-center text-[0.75rem] leading-relaxed text-white/80">
+        {t.footer.legal.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+        <p className="mt-4 uppercase text-white">© 2026 VIVIÈRE</p>
       </div>
     </footer>
   )
