@@ -5,6 +5,7 @@ import { ArticleImage, formatArticleDate } from "@/components/blog/article-image
 import { BLOGS, listArticles } from "@/lib/data/articles"
 import { LANG_LOCALE } from "@/lib/i18n/config"
 import { getDictionary, getLang } from "@/lib/i18n/server"
+import { pageMetadata } from "@/lib/seo"
 
 const BLOG_TITLE = "Blogs"
 
@@ -12,8 +13,9 @@ export function generateStaticParams() {
   return BLOGS.map((blog) => ({ blog }))
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  return { title: BLOG_TITLE }
+export async function generateMetadata({ params }: PageProps<"/[lang]/[market]/blogs/[blog]">): Promise<Metadata> {
+  const [{ blog }, lang] = await Promise.all([params, getLang()])
+  return pageMetadata({ path: `/blogs/${blog}`, lang, title: BLOG_TITLE })
 }
 
 /** templates/blog.json (Horizon main-blog): title, then a grid of article cards. */

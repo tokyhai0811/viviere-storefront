@@ -4,6 +4,7 @@ import { getCollectionByHandle, listCollections, listProducts } from "@/lib/data
 import { ProductCard } from "@/components/product/product-card"
 import { LANG_LOCALE } from "@/lib/i18n/config"
 import { getDictionary, getLang } from "@/lib/i18n/server"
+import { getSiteSettings, pageMetadata, pickSeo } from "@/lib/seo"
 
 /**
  * templates/collection.json: no title banner (disabled on the live site),
@@ -17,8 +18,22 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/[market]/collections/[handle]">): Promise<Metadata> {
   const { handle } = await params
-  const [collection, t] = await Promise.all([getCollectionByHandle(handle), getDictionary()])
-  return { title: collection?.title ?? t.meta.collection }
+  const [collection, t, lang, settings] = await Promise.all([
+    getCollectionByHandle(handle),
+    getDictionary(),
+    getLang(),
+    getSiteSettings(),
+  ])
+  if (!collection) return { title: t.meta.collection }
+  const seo = pickSeo(collection.metadata, lang)
+  return pageMetadata({
+    path: `/collections/${handle}`,
+    lang,
+    title: collection.title,
+    seoTitle: seo.title,
+    // viviere.vn's collections reuse the store description.
+    description: seo.description ?? pickSeo(settings, lang).description,
+  })
 }
 
 export default async function CollectionPage({ params }: PageProps<"/[lang]/[market]/collections/[handle]">) {

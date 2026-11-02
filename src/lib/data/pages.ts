@@ -13,6 +13,12 @@ export type StorePage = {
   title: string
   /** HTML from the admin editor, or Markdown for older pages. See renderRichText. */
   body: string
+  updated_at?: string
+  /** Search engine listing; empty falls back to the title and the body's start. */
+  seo_title?: string | null
+  seo_description?: string | null
+  seo_title_vi?: string | null
+  seo_description_vi?: string | null
 }
 
 const MOCK_PAGES: StorePage[] = [
@@ -24,7 +30,7 @@ const MOCK_PAGES: StorePage[] = [
   { handle: "terms-of-service", title: "Terms of Service" },
 ].map((p) => ({ ...p, id: `page_${p.handle}`, body: "Placeholder text. Connect the Medusa backend to edit this page in the admin." }))
 
-export async function listPages(): Promise<Pick<StorePage, "handle" | "title">[]> {
+export async function listPages(): Promise<Pick<StorePage, "handle" | "title" | "updated_at">[]> {
   "use cache"
   cacheLife("minutes")
   if (!medusaEnabled) return MOCK_PAGES

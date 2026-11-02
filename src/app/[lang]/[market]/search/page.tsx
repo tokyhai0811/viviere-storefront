@@ -1,11 +1,12 @@
 import type { Metadata } from "next"
+import { noindex } from "@/lib/seo"
 import { Suspense } from "react"
 import { listProducts } from "@/lib/data/products"
 import { getDictionary } from "@/lib/i18n/server"
 import { SearchResults } from "@/components/search/search-results"
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getDictionary()).meta.search }
+  return { title: (await getDictionary()).meta.search, robots: noindex }
 }
 
 /** Shopify's /search?q=…, opened from "View all" in the search drawer. */

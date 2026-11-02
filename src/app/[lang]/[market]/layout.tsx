@@ -6,6 +6,7 @@ import { medusaEnabled } from "@/lib/medusa/client"
 import { LANGS, LANG_LOCALE, MARKETS } from "@/lib/i18n/config"
 import { I18nProvider } from "@/lib/i18n/client"
 import { getDictionary, getLang, getMarket } from "@/lib/i18n/server"
+import { SITE_NAME, SITE_URL, getSiteSettings, pickSeo } from "@/lib/seo"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { CartDrawer } from "@/components/cart/cart-drawer"
@@ -26,10 +27,13 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getDictionary()
+  const [t, lang, settings] = await Promise.all([getDictionary(), getLang(), getSiteSettings()])
   return {
-    title: { default: "VIVIÈRE", template: "%s | VIVIÈRE" },
-    description: t.meta.description,
+    metadataBase: new URL(SITE_URL),
+    title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+    description: pickSeo(settings, lang).description ?? t.meta.description,
+    applicationName: SITE_NAME,
+    ...(settings.google_site_verification ? { verification: { google: settings.google_site_verification } } : {}),
   }
 }
 

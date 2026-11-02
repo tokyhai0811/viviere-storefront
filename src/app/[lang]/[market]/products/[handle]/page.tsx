@@ -2,9 +2,13 @@ import type { Metadata } from "next"
 import { Link } from "@/components/link"
 import { notFound } from "next/navigation"
 import { getProductByHandle, listColorSiblings, listProducts, metaText } from "@/lib/data/products"
-import { LANG_LOCALE, localizePath } from "@/lib/i18n/config"
+import { LANG_LOCALE, localizePath, type Lang } from "@/lib/i18n/config"
 import { getDictionary, getLang, getMarket } from "@/lib/i18n/server"
-import { productPrice } from "@/components/product/product-card"
+import { isSoldOut, productPrice } from "@/components/product/product-card"
+import { productThumbnail } from "@/components/product-image"
+import { JsonLd } from "@/components/json-ld"
+import { SITE_NAME, SITE_URL, excerpt, pageMetadata, pickSeo } from "@/lib/seo"
+import type { StoreProduct } from "@/lib/types"
 import { MediaGallery } from "@/components/product/media-gallery"
 import { AddToCart } from "@/components/product/add-to-cart"
 import { Accordion } from "@/components/product/accordion"
@@ -23,14 +27,55 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/[market]/products/[handle]">): Promise<Metadata> {
   const { handle } = await params
-  const [product, t] = await Promise.all([getProductByHandle(handle), getDictionary()])
+  const [product, t, lang] = await Promise.all([getProductByHandle(handle), getDictionary(), getLang()])
+  if (!product) return { title: t.meta.product }
+  const seo = pickSeo(product.metadata, lang)
+  const price = product.variants[0]?.calculated_price
+  return pageMetadata({
+    path: `/products/${handle}`,
+    lang,
+    title: product.title,
+    seoTitle: seo.title,
+    description: seo.description ?? excerpt(product.description),
+    image: productThumbnail(product),
+    // Shopify's og:price tags, read by Facebook and Zalo link previews.
+    extra: price
+      ? {
+          other: {
+            "product:price:amount": String(price.calculated_amount),
+            "product:price:currency": price.currency_code.toUpperCase(),
+          },
+        }
+      : undefined,
+  })
+}
+
+/** schema.org Product, so Google can show price and stock in results. */
+function productJsonLd(product: StoreProduct, lang: Lang) {
+  const price = product.variants[0]?.calculated_price
+  const url = new URL(localizePath(lang, `/products/${product.handle}`), SITE_URL).href
   return {
-    title: product?.title ?? t.meta.product,
-    description: product?.description ?? undefined,
-    // The same product in the other language.
-    alternates: {
-      languages: { en: `/products/${handle}`, vi: localizePath("vi", `/products/${handle}`) },
-    },
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    description: product.description ?? undefined,
+    image: product.images.map((i) => i.url).filter(Boolean),
+    sku: product.variants[0]?.sku ?? undefined,
+    color: product.metadata?.color,
+    brand: { "@type": "Brand", name: SITE_NAME },
+    url,
+    ...(price
+      ? {
+          offers: {
+            "@type": "Offer",
+            url,
+            price: price.calculated_amount,
+            priceCurrency: price.currency_code.toUpperCase(),
+            availability: isSoldOut(product) ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+            itemCondition: "https://schema.org/NewCondition",
+          },
+        }
+      : {}),
   }
 }
 
@@ -49,6 +94,7 @@ export default async function ProductPage({ params }: PageProps<"/[lang]/[market
 
   return (
     <>
+      <JsonLd data={productJsonLd(product, lang)} />
       <section className="grid md:grid-cols-2 md:pt-20">
         <div className="pt-16 md:pt-0">
           <MediaGallery images={product.images} title={product.title} />
