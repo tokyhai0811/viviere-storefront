@@ -23,6 +23,7 @@ export function MediaGallery({ images, title }: { images: StoreImage[]; title: s
             src={img.url}
             alt={t.product.imageAlt(title, i + 1)}
             sizes="50vw"
+            quality={90}
             preload={i === 0}
             className="aspect-[1/1.25] w-full"
           />
@@ -44,6 +45,7 @@ export function MediaGallery({ images, title }: { images: StoreImage[]; title: s
               src={img.url}
               alt={t.product.imageAlt(title, i + 1)}
               sizes="100vw"
+              quality={90}
               className="aspect-[1/1.25] w-full shrink-0 snap-start"
             />
           ))}
