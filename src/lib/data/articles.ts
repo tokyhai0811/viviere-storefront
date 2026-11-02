@@ -21,6 +21,10 @@ export type StoreArticle = {
   image_url: string | null
   author: string | null
   published_at: string | null
+  seo_title?: string | null
+  seo_description?: string | null
+  seo_title_vi?: string | null
+  seo_description_vi?: string | null
 }
 
 const MOCK_ARTICLES: StoreArticle[] = [

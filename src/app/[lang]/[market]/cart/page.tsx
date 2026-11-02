@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { noindex } from "@/lib/seo"
 import { LANG_LOCALE } from "@/lib/i18n/config"
 import { getDictionary, getLang } from "@/lib/i18n/server"
 import { Link } from "@/components/link"
@@ -7,7 +8,7 @@ import { CartContents } from "@/components/cart/cart-contents"
 import { ProductCard } from "@/components/product/product-card"
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getDictionary()).meta.cart }
+  return { title: (await getDictionary()).meta.cart, robots: noindex }
 }
 
 /** templates/cart.json: main cart, then "You may also like" (4 products), then a divider. */

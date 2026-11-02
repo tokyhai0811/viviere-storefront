@@ -4,8 +4,10 @@ import { Link } from "@/components/link"
 import { ArticleImage, formatArticleDate } from "@/components/blog/article-image"
 import { BLOGS, getArticle, listArticles } from "@/lib/data/articles"
 import { renderRichText } from "@/lib/rich-text"
-import { LANG_LOCALE } from "@/lib/i18n/config"
 import { getDictionary, getLang } from "@/lib/i18n/server"
+import { JsonLd } from "@/components/json-ld"
+import { SITE_NAME, SITE_URL, excerpt, pageMetadata, pickSeo } from "@/lib/seo"
+import { LANG_LOCALE, localizePath } from "@/lib/i18n/config"
 
 // Both segments are listed here: Next needs every param of the leaf route.
 export async function generateStaticParams() {
@@ -15,8 +17,18 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/[market]/blogs/[blog]/[article]">): Promise<Metadata> {
   const { blog, article: handle } = await params
-  const [article, t] = await Promise.all([getArticle(blog, handle), getDictionary()])
-  return { title: article?.title ?? t.meta.blog, description: article?.excerpt || undefined }
+  const [article, t, lang] = await Promise.all([getArticle(blog, handle), getDictionary(), getLang()])
+  if (!article) return { title: t.meta.blog }
+  const seo = pickSeo(article, lang)
+  return pageMetadata({
+    path: `/blogs/${blog}/${handle}`,
+    lang,
+    type: "article",
+    title: article.title,
+    seoTitle: seo.title,
+    description: seo.description ?? (excerpt(article.excerpt) || excerpt(article.body)),
+    image: article.image_url,
+  })
 }
 
 /** templates/article.json: title, date, cover image, then the rich text body. */
@@ -30,6 +42,20 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/[market
 
   return (
     <article className="page-width max-w-[760px] py-12 md:py-16">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: article.title,
+          description: article.excerpt || undefined,
+          image: article.image_url ?? undefined,
+          datePublished: article.published_at ?? undefined,
+          author: { "@type": "Organization", name: article.author || SITE_NAME },
+          publisher: { "@type": "Organization", name: SITE_NAME },
+          mainEntityOfPage: new URL(localizePath(lang, `/blogs/${blog}/${handle}`), SITE_URL).href,
+          inLanguage: lang,
+        }}
+      />
       <header className="mb-8 text-center">
         {date && <p className="text-[0.75rem] uppercase text-muted">{date}</p>}
         <h1 className="type-h2 mt-2">{article.title}</h1>
