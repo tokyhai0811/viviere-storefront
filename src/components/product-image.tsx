@@ -12,17 +12,20 @@ export function ProductImage({
   sizes,
   className = "",
   preload,
+  quality,
 }: {
   src: string | null | undefined
   alt: string
   sizes: string
   className?: string
   preload?: boolean
+  /** 75 unless set; 90 is the only other value next.config allows. */
+  quality?: 75 | 90
 }) {
   if (!src) return <Placeholder label={alt} className={className} />
   return (
     <div className={`relative overflow-hidden bg-placeholder ${className}`}>
-      <Image src={src} alt={alt} fill sizes={sizes} preload={preload} className="object-cover" />
+      <Image src={src} alt={alt} fill sizes={sizes} preload={preload} quality={quality} className="object-cover" />
     </div>
   )
 }

@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   images: {
+    // 75 (Next's default) for cards and thumbnails, 90 for the product page.
+    qualities: [75, 90],
     // Product images uploaded in the Medusa admin are stored in S3.
     remotePatterns: [{ protocol: "https", hostname: "**.amazonaws.com" }, ...backendImages()],
   },
