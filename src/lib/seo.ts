@@ -34,6 +34,8 @@ export type SiteSettings = {
   home_hero_image_mobile?: string | null
   home_silhouette_image?: string | null
   home_lifestyle_image?: string | null
+  /** Theme › Home page text and products, as JSON. See src/lib/home.ts. */
+  theme_home?: string | null
 }
 
 // viviere.vn's home page listing, used without a backend.

@@ -10,6 +10,7 @@ import { localizePath } from "@/lib/i18n/config"
 import { JsonLd } from "@/components/json-ld"
 import { SITE_NAME, SITE_URL, getSiteSettings, pageMetadata, pickSeo } from "@/lib/seo"
 import type { StoreProduct } from "@/lib/types"
+import { parseHomeContent } from "@/lib/home"
 
 const side = (p: StoreProduct) => ({
   label: colorLabel(p).toUpperCase(),
@@ -25,6 +26,15 @@ const SUMMER_COLORS = ["Blue", "Yellow"]
 /** Products in the given colours (English metadata colour), in that order. */
 const byColor = (products: StoreProduct[], colors: string[]) =>
   colors.flatMap((c) => products.filter((p) => p.metadata?.color === c))
+
+/**
+ * The products picked in the admin, slot by slot; an empty slot (or a product
+ * since deleted) takes the default colour for that slot.
+ */
+const pickSlots = (products: StoreProduct[], ids: string[], defaults: StoreProduct[], count: number) => {
+  const picked = Array.from({ length: count }, (_, i) => products.find((p) => p.id === ids[i]) ?? defaults[i])
+  return picked.filter((p): p is StoreProduct => !!p)
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const [lang, settings, t] = await Promise.all([getLang(), getSiteSettings(), getDictionary()])
@@ -58,10 +68,12 @@ const organization = (lang: string) => ({
 /** Home page, following the enabled sections of templates/index.json in order. */
 export default async function HomePage() {
   const [{ products }, t, lang, settings] = await Promise.all([listProducts(), getDictionary(), getLang(), getSiteSettings()])
-  const gallery = byColor(products, GALLERY_COLORS)
-  const summer = byColor(products, SUMMER_COLORS)
-  // Catalogues without those colours fall back to catalogue order.
-  const [before, after] = summer.length === 2 ? summer : products.slice(-2)
+  const home = parseHomeContent(settings.theme_home, lang)
+  // Catalogues without the default colours fall back to catalogue order.
+  const defaultGallery = byColor(products, GALLERY_COLORS)
+  const defaultSummer = byColor(products, SUMMER_COLORS)
+  const gallery = pickSlots(products, home.galleryProducts, defaultGallery.length ? defaultGallery : products, 4)
+  const [before, after] = pickSlots(products, home.summerProducts, defaultSummer.length === 2 ? defaultSummer : products.slice(-2), 2)
 
   return (
     <>
@@ -80,12 +92,18 @@ export default async function HomePage() {
           },
         }}
       />
-      <Hero t={t} image={settings.home_hero_image} mobileImage={settings.home_hero_image_mobile} />
-      <SilhouetteRow t={t} image={settings.home_silhouette_image} />
-      <ColorGallery products={gallery.length ? gallery : products} image={settings.home_lifestyle_image} />
+      <Hero
+        title={home.heroTitle ?? "The Bateau"}
+        linkLabel={home.heroLinkLabel ?? t.home.explore}
+        link={home.heroLink ?? "/collections/all"}
+        image={settings.home_hero_image}
+        mobileImage={settings.home_hero_image_mobile}
+      />
+      <SilhouetteRow lines={home.silhouette ?? t.home.silhouette} image={settings.home_silhouette_image} />
+      <ColorGallery products={gallery} image={settings.home_lifestyle_image} />
       {before && after && (
         <section className="page-width space-y-8 pb-16">
-          <h2 className="font-body text-center text-[1.5rem] font-light">{t.home.summerColors}</h2>
+          <h2 className="font-body text-center text-[1.5rem] font-light">{home.summerTitle ?? t.home.summerColors}</h2>
           <ComparisonSlider before={side(before)} after={side(after)} />
         </section>
       )}
