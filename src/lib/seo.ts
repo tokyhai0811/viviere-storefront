@@ -29,6 +29,11 @@ export type SiteSettings = {
   google_site_verification: string | null
   /** Theme › Typography, as JSON. See src/lib/typography.ts. */
   theme_typography?: string | null
+  /** Theme › Home page images (URLs). */
+  home_hero_image?: string | null
+  home_hero_image_mobile?: string | null
+  home_silhouette_image?: string | null
+  home_lifestyle_image?: string | null
 }
 
 // viviere.vn's home page listing, used without a backend.

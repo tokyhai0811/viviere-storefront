@@ -57,7 +57,7 @@ const organization = (lang: string) => ({
 
 /** Home page, following the enabled sections of templates/index.json in order. */
 export default async function HomePage() {
-  const [{ products }, t, lang] = await Promise.all([listProducts(), getDictionary(), getLang()])
+  const [{ products }, t, lang, settings] = await Promise.all([listProducts(), getDictionary(), getLang(), getSiteSettings()])
   const gallery = byColor(products, GALLERY_COLORS)
   const summer = byColor(products, SUMMER_COLORS)
   // Catalogues without those colours fall back to catalogue order.
@@ -80,9 +80,9 @@ export default async function HomePage() {
           },
         }}
       />
-      <Hero t={t} />
-      <SilhouetteRow t={t} />
-      <ColorGallery products={gallery.length ? gallery : products} />
+      <Hero t={t} image={settings.home_hero_image} mobileImage={settings.home_hero_image_mobile} />
+      <SilhouetteRow t={t} image={settings.home_silhouette_image} />
+      <ColorGallery products={gallery.length ? gallery : products} image={settings.home_lifestyle_image} />
       {before && after && (
         <section className="page-width space-y-8 pb-16">
           <h2 className="font-body text-center text-[1.5rem] font-light">{t.home.summerColors}</h2>
