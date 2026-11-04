@@ -7,17 +7,27 @@ import { LANGS, LANG_LOCALE, MARKETS } from "@/lib/i18n/config"
 import { I18nProvider } from "@/lib/i18n/client"
 import { getDictionary, getLang, getMarket } from "@/lib/i18n/server"
 import { SITE_NAME, SITE_URL, getSiteSettings, pickSeo } from "@/lib/seo"
+import { googleFontsHref, parseTypography, typographyCss } from "@/lib/typography"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
 import { CartDrawer } from "@/components/cart/cart-drawer"
 // Fonts from settings_data.json: heading playfair_display_n4, body ibm_plex_sans_n3, accent montserrat_n3.
-// Self-hosted via Fontsource so builds never fetch from Google Fonts.
+// Self-hosted via Fontsource so builds never fetch from Google Fonts. Every
+// weight the admin's Typography page offers for these three is imported;
+// browsers only download the ones a page uses. Other fonts chosen there load
+// from Google Fonts.
 import "@fontsource/playfair-display/400.css"
 import "@fontsource/playfair-display/400-italic.css"
+import "@fontsource/playfair-display/500.css"
+import "@fontsource/playfair-display/600.css"
+import "@fontsource/playfair-display/700.css"
 import "@fontsource/ibm-plex-sans/300.css"
 import "@fontsource/ibm-plex-sans/400.css"
 import "@fontsource/ibm-plex-sans/500.css"
+import "@fontsource/ibm-plex-sans/600.css"
 import "@fontsource/montserrat/300.css"
+import "@fontsource/montserrat/400.css"
+import "@fontsource/montserrat/500.css"
 import "@fontsource/montserrat/600.css"
 import "../../globals.css"
 
@@ -41,9 +51,22 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]/[mar
   const [lang, market] = await Promise.all([getLang(), getMarket()])
   const [{ products }, collections] = await Promise.all([listProducts(), listCollections()])
   const regionId = medusaEnabled ? await getRegionId() : null
+  const typography = parseTypography((await getSiteSettings()).theme_typography)
+  const fontsHref = googleFontsHref(typography)
 
   return (
     <html lang={lang} className="h-full">
+      <head>
+        {fontsHref && (
+          <>
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+            <link rel="stylesheet" href={fontsHref} />
+          </>
+        )}
+        {/* Theme › Typography from the admin. Values are validated in parseTypography. */}
+        <style dangerouslySetInnerHTML={{ __html: typographyCss(typography) }} />
+      </head>
       <body className="flex min-h-full flex-col">
         <I18nProvider lang={lang} market={market}>
           <CartProvider regionId={regionId} locale={LANG_LOCALE[lang]}>
