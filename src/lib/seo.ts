@@ -27,6 +27,8 @@ export type SiteSettings = {
   seo_description_vi: string | null
   seo_image: string | null
   google_site_verification: string | null
+  /** Theme › Typography, as JSON. See src/lib/typography.ts. */
+  theme_typography?: string | null
 }
 
 // viviere.vn's home page listing, used without a backend.
