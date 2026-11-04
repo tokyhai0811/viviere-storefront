@@ -148,7 +148,9 @@ export function Header({
           {/* Centre: logo */}
           <Link
             href="/"
-            className="font-accent text-[1.375rem] font-light tracking-[0.35em] md:text-[1.75rem]"
+            // Matches viviere.vn's header-logo: Montserrat 600, 28px, white with
+            // difference blending so it reads black on the white header.
+            className="font-['Montserrat',sans-serif] text-[28px] font-semibold leading-none text-white mix-blend-difference"
             aria-label={t.nav.home}
           >
             VIVIÈRE
