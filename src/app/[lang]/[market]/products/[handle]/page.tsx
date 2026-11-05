@@ -1,3 +1,4 @@
+import Image from "next/image"
 import type { Metadata } from "next"
 import { Link } from "@/components/link"
 import { notFound } from "next/navigation"
@@ -129,6 +130,10 @@ export default async function ProductPage({ params }: PageProps<"/[lang]/[market
                         className="relative inline-block h-6 w-10 hover:opacity-85"
                         style={{ backgroundColor: s.metadata?.swatch_hex ?? "#ccc" }}
                       >
+                        {/* Swatch image (a colour or a texture) from the admin; else the hex colour. */}
+                        {s.metadata?.swatch_image && (
+                          <Image src={s.metadata.swatch_image} alt="" fill sizes="40px" className="object-cover" />
+                        )}
                         {active && <span className="absolute inset-x-0 -bottom-1.5 h-px bg-black" />}
                       </Link>
                     )
