@@ -60,6 +60,8 @@ export type ProductMetadata = {
   color_group?: string
   color?: string
   swatch_hex?: string
+  /** Swatch image URL (colour or texture); takes precedence over swatch_hex. */
+  swatch_image?: string
   size?: string
   material_and_care?: string
   origin?: string
