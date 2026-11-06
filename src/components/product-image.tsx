@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image, { type ImageLoader } from "next/image"
 import { Placeholder } from "@/components/placeholder"
 
 /**
@@ -13,6 +13,7 @@ export function ProductImage({
   className = "",
   preload,
   quality,
+  loader,
 }: {
   src: string | null | undefined
   alt: string
@@ -21,11 +22,13 @@ export function ProductImage({
   preload?: boolean
   /** 75 unless set; 90 is the only other value next.config allows. */
   quality?: 75 | 90
+  /** Overrides the URL per width; the product page uses it to set a minimum. */
+  loader?: ImageLoader
 }) {
   if (!src) return <Placeholder label={alt} className={className} />
   return (
     <div className={`relative overflow-hidden bg-placeholder ${className}`}>
-      <Image src={src} alt={alt} fill sizes={sizes} preload={preload} quality={quality} className="object-cover" />
+      <Image src={src} alt={alt} fill sizes={sizes} preload={preload} quality={quality} loader={loader} className="object-cover" />
     </div>
   )
 }
