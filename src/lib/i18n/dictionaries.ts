@@ -78,6 +78,8 @@ const en = {
     taxIncluded: "Price includes VAT.",
     freeShippingVn: "Free shipping within Vietnam.",
     imageAlt: (title: string, i: number) => `${title}, image ${i}`,
+    zoom: "Zoom",
+    closeZoom: "Close",
     crafted: {
       heading: "Crafted with Enduring Purpose",
       columns: [
@@ -248,6 +250,8 @@ const vi: Dictionary = {
     taxIncluded: "Giá đã bao gồm VAT.",
     freeShippingVn: "Miễn phí giao hàng toàn quốc.",
     imageAlt: (title: string, i: number) => `${title}, ảnh ${i}`,
+    zoom: "Phóng to",
+    closeZoom: "Đóng",
     crafted: {
       heading: "Được chế tác cho sự bền lâu",
       columns: [

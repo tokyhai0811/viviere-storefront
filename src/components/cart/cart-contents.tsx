@@ -14,16 +14,16 @@ export function CartContents() {
 
   return (
     <section className="page-width pt-8">
-      <h1 className="type-h4">
-        {t.cart.title} <span className="font-body text-[0.75rem] text-muted">({itemCount})</span>
-      </h1>
-
       {cart.items.length === 0 ? (
-        <div className="flex flex-col items-start gap-6 py-16">
-          <p className="type-h4">{t.cart.empty}</p>
-          <Link href="/collections/all" className="btn-primary">{t.cart.continueShopping}</Link>
+        <div className="flex flex-col items-center gap-6 pt-20 pb-[81px] text-center">
+          <h1 className="type-h4">{t.cart.empty}</h1>
+          <Link href="/collections/all" className="btn-secondary">{t.cart.continueShopping}</Link>
         </div>
       ) : (
+        <>
+        <h1 className="type-h4">
+          {t.cart.title} <span className="font-body text-[0.75rem] text-muted">({itemCount})</span>
+        </h1>
         <div className="grid gap-10 md:grid-cols-[1fr_380px] md:gap-16">
           <ul className="border-t border-border md:mt-4">
             {cart.items.map((item) => (
@@ -43,6 +43,7 @@ export function CartContents() {
             <Link href="/checkout" className="btn-primary w-full">{t.cart.checkOut}</Link>
           </aside>
         </div>
+        </>
       )}
     </section>
   )

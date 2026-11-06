@@ -63,10 +63,13 @@ export function ComparisonSlider({ before, after }: { before: Side; after: Side 
             if (e.key === "ArrowLeft") setPosition((p) => Math.max(0, p - 5))
             if (e.key === "ArrowRight") setPosition((p) => Math.min(100, p + 5))
           }}
-          className="absolute top-1/2 left-1/2 flex size-[50px] -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center rounded-full bg-white shadow-md hover:bg-[#f5f5f5]"
+          className="absolute top-1/2 left-1/2 flex size-[50px] -translate-x-1/2 -translate-y-1/2 cursor-ew-resize items-center justify-center gap-1 rounded-full bg-white text-black shadow-[0_2px_8px_rgba(0,0,0,0.2)] hover:bg-[#f5f5f5]"
         >
-          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="black" strokeWidth={1.5} aria-hidden>
-            <path d="M9 6l-6 6 6 6M15 6l6 6-6 6" />
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <polyline points="9 18 15 12 9 6" />
           </svg>
         </div>
       </div>
@@ -74,14 +77,14 @@ export function ComparisonSlider({ before, after }: { before: Side; after: Side 
       <Link
         href={before.href}
         onPointerDown={(e) => e.stopPropagation()}
-        className="absolute bottom-[30px] left-[30px] bg-[#f8f8f8] px-3 py-1 font-body text-[14px] font-normal md:text-[18px]"
+        className="absolute top-1 left-2.5 rounded px-1 py-1.5 font-body text-[12px] leading-[1.6] font-normal text-black md:top-auto md:bottom-[30px] md:left-[30px] md:px-4 md:py-2 md:text-[18px]"
       >
         {before.label}
       </Link>
       <Link
         href={after.href}
         onPointerDown={(e) => e.stopPropagation()}
-        className="absolute right-[30px] bottom-[30px] bg-[#f8f8f8] px-3 py-1 font-body text-[14px] font-normal md:text-[18px]"
+        className="absolute top-1 right-2.5 rounded px-1 py-1.5 font-body text-[12px] leading-[1.6] font-normal text-black md:top-auto md:right-[30px] md:bottom-[30px] md:px-4 md:py-2 md:text-[18px]"
       >
         {after.label}
       </Link>

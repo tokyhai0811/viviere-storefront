@@ -12,26 +12,26 @@ export function ColorGallery({ products, image }: { products: StoreProduct[]; im
   if (!products.length) return null
 
   return (
-    <section className="page-width py-12 md:py-16">
-      <div className="grid gap-5 md:grid-cols-2">
+    <section className="page-width pt-8 pb-6 md:py-10">
+      <div className="grid gap-[15px] md:grid-cols-2 md:gap-5">
         <ProductImage
           src={image}
           alt="The Bateau lifestyle"
           sizes="(min-width: 768px) 50vw, 100vw"
-          className="aspect-square w-full md:aspect-auto md:h-full"
+          className="aspect-[5/7] w-full md:aspect-auto md:h-full"
         />
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-[15px] md:gap-5">
           {products.slice(0, 4).map((p) => {
             const label = colorLabel(p).toUpperCase()
             return (
-              <Link key={p.id} href={`/products/${p.handle}`} className="group block">
+              <Link key={p.id} href={`/products/${p.handle}`} className="group block md:pb-6">
                 <ProductImage
                   src={productThumbnail(p)}
                   alt={p.title}
                   sizes="(min-width: 768px) 25vw, 50vw"
-                  className="aspect-square w-full transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="aspect-[4/5] w-full transition-transform duration-500 group-hover:scale-[1.02]"
                 />
-                <p className="mt-2 text-center text-[12px]">{label}</p>
+                <p className="mt-3 text-center text-[12px] leading-[1.4]">{label}</p>
               </Link>
             )
           })}

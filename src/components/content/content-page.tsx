@@ -12,8 +12,8 @@ export async function ContentPage({ handle }: { handle: string }) {
   const html = await renderRichText(page.body)
 
   return (
-    <section className="page-width max-w-[720px] py-12 md:py-20">
-      <h1 className="type-h2 mb-8 text-center">{page.title}</h1>
+    <section className="mx-auto w-full max-w-[672px] px-4 pt-10 pb-8 md:px-0">
+      <h1 className="type-h2 mb-[33px] text-center">{page.title}</h1>
       <div className="rich-text" dangerouslySetInnerHTML={{ __html: html }} />
       {/* viviere.vn's Contact & Complaints page ends with a contact form. */}
       {handle === "contact" && <ContactForm />}

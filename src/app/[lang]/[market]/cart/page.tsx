@@ -21,8 +21,8 @@ export default async function CartPage() {
 
       <section className="page-width py-12">
         <div className="mb-7 flex items-end justify-between">
-          <h3 className="font-body text-[1.125rem] font-light">{t.cart.youMayAlsoLike}</h3>
-          <Link href="/collections/all" className="link-underline uppercase">{t.cart.viewAll}</Link>
+          <h3 className="type-h4">{t.cart.youMayAlsoLike}</h3>
+          <Link href="/collections/all" className="link-underline text-muted">{t.cart.viewAll}</Link>
         </div>
         <ul className="grid grid-cols-2 gap-x-[26px] gap-y-9 md:grid-cols-4">
           {products.map((p) => (

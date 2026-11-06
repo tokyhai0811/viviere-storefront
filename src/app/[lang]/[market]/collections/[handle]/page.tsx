@@ -48,9 +48,9 @@ export default async function CollectionPage({ params }: PageProps<"/[lang]/[mar
   ])
 
   return (
-    <section className="page-width pt-6 pb-[66px] md:pt-10">
+    <section className="page-width pb-[66px] max-md:px-0!">
       <h1 className="sr-only">{collection.title}</h1>
-      <ul className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-5">
+      <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
         {products.map((p) => (
           <li key={p.id}>
             <ProductCard product={p} locale={LANG_LOCALE[lang]} t={t} />

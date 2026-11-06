@@ -1,3 +1,5 @@
+import type { ImageLoader } from "next/image"
+
 /**
  * Image sizes and quality for the product page, in one place to tune.
  *
@@ -12,4 +14,12 @@ export const PRODUCT_PAGE_IMAGES = {
   // is roughly 300 KB or more for a product photo.
   minWidthDesktop: 1920,
   minWidthMobile: 1200,
+  // The zoom dialog shows the full master, as viviere.vn does.
+  zoomWidth: 3840,
 } as const
+
+/** Next's own optimizer, but never below `min` pixels wide. */
+export function minWidthLoader(min: number): ImageLoader {
+  return ({ src, width, quality }) =>
+    `/_next/image?url=${encodeURIComponent(src)}&w=${Math.max(width, min)}&q=${quality ?? PRODUCT_PAGE_IMAGES.quality}`
+}

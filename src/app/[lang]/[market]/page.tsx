@@ -102,8 +102,8 @@ export default async function HomePage() {
       <SilhouetteRow lines={home.silhouette ?? t.home.silhouette} image={settings.home_silhouette_image} />
       <ColorGallery products={gallery} image={settings.home_lifestyle_image} />
       {before && after && (
-        <section className="page-width space-y-8 pb-16">
-          <h2 className="font-body text-center text-[1.5rem] font-light">{home.summerTitle ?? t.home.summerColors}</h2>
+        <section className="page-width pt-8 pb-4 md:py-10">
+          <h2 className="type-h2 mb-5 text-center">{home.summerTitle ?? t.home.summerColors}</h2>
           <ComparisonSlider before={side(before)} after={side(after)} />
         </section>
       )}

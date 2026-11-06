@@ -97,18 +97,18 @@ export default async function ProductPage({ params }: PageProps<"/[lang]/[market
     <>
       <JsonLd data={productJsonLd(product, lang)} />
       <section className="grid md:grid-cols-2 md:pt-20">
-        <div className="pt-16 md:pt-0">
+        <div className="pt-14 md:pt-0">
           <MediaGallery images={product.images} title={product.title} />
         </div>
 
-        <div className="px-4 md:px-10">
-          <div className="flex flex-col gap-3 pt-5 pb-10 md:sticky md:top-20 md:max-w-[480px]">
+        <div className="flex justify-center px-4 md:pr-4 md:pl-0">
+          <div className="flex w-full flex-col gap-3 pt-5 pb-10 md:sticky md:top-[84px] md:mt-[71px] md:max-w-[400px] md:self-start">
             <div className="flex items-start justify-between gap-3">
-              <h1 className="w-[65%] font-accent text-[0.875rem] font-semibold">{product.title}</h1>
-              <p className="w-[30%] text-right font-accent text-[0.875rem]">{productPrice(product, LANG_LOCALE[lang])}</p>
+              <h1 className="w-[65%] font-accent text-[0.875rem] leading-[1.4] font-semibold not-italic">{product.title}</h1>
+              <p className="w-[30%] text-right font-accent text-[0.875rem] leading-[1.4] font-light">{productPrice(product, LANG_LOCALE[lang])}</p>
             </div>
             {/* viviere.vn: "Price includes VAT. Free shipping within Vietnam." */}
-            <p className="-mt-1 text-[0.75rem] text-muted">
+            <p className="text-right text-[0.75rem] text-black/55">
               {t.product.taxIncluded}
               {market === "vn" && ` ${t.product.freeShippingVn}`}
             </p>
@@ -142,7 +142,7 @@ export default async function ProductPage({ params }: PageProps<"/[lang]/[market
               </div>
             )}
 
-            <p className="py-5 text-[0.875rem] leading-relaxed">{product.description}</p>
+            <p className="py-5 text-[0.75rem] tracking-[-0.5px]">{product.description}</p>
 
             <div className="pb-6">
               <AddToCart product={product} />

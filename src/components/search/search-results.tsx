@@ -20,20 +20,20 @@ export function SearchResults({ products }: { products: StoreProduct[] }) {
     <>
       <form
         role="search"
-        className="mx-auto mb-10 flex max-w-[480px] items-center gap-3 border-b border-black pb-2"
+        className="relative mx-auto mb-[69px] flex max-w-[675px] items-center"
         onSubmit={(e) => {
           e.preventDefault()
           router.replace(href(`/search?q=${encodeURIComponent(query.trim())}`))
         }}
       >
-        <SearchIcon className="size-4" />
+        <SearchIcon className="pointer-events-none absolute left-5 size-[22px]" />
         <input
           name="q"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t.search.placeholder}
           aria-label={t.search.placeholder}
-          className="flex-1 bg-transparent text-[0.875rem] outline-none"
+          className="w-full border border-black/13 bg-white px-[54px] py-4 text-[0.75rem] leading-[1.6] outline-none focus:border-black"
         />
       </form>
       {needle && (
@@ -41,7 +41,7 @@ export function SearchResults({ products }: { products: StoreProduct[] }) {
           {results.length ? t.search.results(results.length, q) : t.search.noResults(q)}
         </p>
       )}
-      <ul className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-3 md:gap-5">
+      <ul className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
         {results.map((p) => (
           <li key={p.id}>
             <ProductCard product={p} locale={locale} t={t} />

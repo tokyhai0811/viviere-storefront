@@ -41,7 +41,7 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/[market
   const date = formatArticleDate(article.published_at, LANG_LOCALE[lang])
 
   return (
-    <article className="page-width max-w-[760px] py-12 md:py-16">
+    <article className="mx-auto w-full max-w-[760px] px-4 pt-10 pb-12 md:px-0">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -56,13 +56,12 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/[market
           inLanguage: lang,
         }}
       />
-      <header className="mb-8 text-center">
-        {date && <p className="text-[0.75rem] uppercase text-muted">{date}</p>}
-        <h1 className="type-h2 mt-2">{article.title}</h1>
-        {article.author && <p className="mt-2 text-muted">{article.author}</p>}
+      <header className="mx-auto mb-8 max-w-[678px] text-center">
+        <h1 className="type-h2">{article.title}</h1>
+        {date && <p className="mt-6 text-black/70">{date}</p>}
       </header>
-      {article.image_url && <ArticleImage src={article.image_url} alt={article.title} className="mb-10 aspect-[3/2] w-full" />}
-      <div className="rich-text" dangerouslySetInnerHTML={{ __html: html }} />
+      {article.image_url && <ArticleImage src={article.image_url} alt={article.title} className="mb-8 aspect-[3/2] w-full" />}
+      <div className="rich-text mx-auto max-w-[672px]" dangerouslySetInnerHTML={{ __html: html }} />
       <p className="mt-12 text-center">
         <Link href={`/blogs/${blog}`} className="link-underline text-[0.75rem] uppercase">
           ← {t.blog.back}

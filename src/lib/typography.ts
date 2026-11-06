@@ -47,15 +47,15 @@ export type Typography = {
   headings: Record<(typeof LEVELS)[number], HeadingSetting>
 }
 
-/** viviere.vn's settings (settings_data.json): Playfair 400 / IBM Plex Sans 300 / Montserrat 300, 12px text. */
+/** viviere.vn as rendered: Playfair 400 / IBM Plex Sans 400 / Montserrat 300, 12px text on a 1.6 line height. */
 export const DEFAULT_TYPOGRAPHY: Typography = {
   fonts: {
     heading: { family: "Playfair Display", weight: 400 },
-    body: { family: "IBM Plex Sans", weight: 300 },
+    body: { family: "IBM Plex Sans", weight: 400 },
     accent: { family: "Montserrat", weight: 300 },
   },
   body_size: 12,
-  body_line_height: 1.8,
+  body_line_height: 1.6,
   headings: {
     h1: { font: "heading", size: 32, uppercase: false, letter_spacing: 0 },
     h2: { font: "heading", size: 24, uppercase: false, letter_spacing: 0 },

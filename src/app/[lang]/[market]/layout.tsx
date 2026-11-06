@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { CartProvider } from "@/lib/cart-context"
-import { listCollections, listProducts } from "@/lib/data/products"
+import { listProducts } from "@/lib/data/products"
 import { getRegionId } from "@/lib/data/medusa"
 import { medusaEnabled } from "@/lib/medusa/client"
 import { LANGS, LANG_LOCALE, MARKETS } from "@/lib/i18n/config"
@@ -49,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: LayoutProps<"/[lang]/[market]">) {
   const [lang, market] = await Promise.all([getLang(), getMarket()])
-  const [{ products }, collections] = await Promise.all([listProducts(), listCollections()])
+  const { products } = await listProducts()
   const regionId = medusaEnabled ? await getRegionId() : null
   const typography = parseTypography((await getSiteSettings()).theme_typography)
   const fontsHref = googleFontsHref(typography)
@@ -70,7 +70,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]/[mar
       <body className="flex min-h-full flex-col">
         <I18nProvider lang={lang} market={market}>
           <CartProvider regionId={regionId} locale={LANG_LOCALE[lang]}>
-            <Header products={products} collections={collections} />
+            <Header products={products} />
             <main className="flex-1">{children}</main>
             <Footer />
             <CartDrawer />

@@ -6,7 +6,7 @@ import { useI18n, usePagePath } from "@/lib/i18n/client"
 
 type Status = "idle" | "sending" | "sent" | "failed"
 
-const field = "w-full border border-border bg-transparent px-3 py-2.5 text-[0.875rem] outline-none focus:border-black"
+const field = "w-full border border-black/13 bg-white px-5 py-4 text-[0.75rem] leading-[1.6] outline-none placeholder:text-black/60 focus:border-black"
 
 /**
  * viviere.vn's contact form (Name, Email, Phone number, Comment). Messages go
@@ -41,32 +41,32 @@ export function ContactForm() {
   }
 
   return (
-    <section className="mt-14 border-t border-border pt-10">
-      <h2 className="type-h3 mb-6 text-center">{t.contactForm.heading}</h2>
+    <section className="mt-[45px]">
+      <h2 className="type-h2 mb-8 text-center">{t.contactForm.heading}</h2>
       {status === "sent" ? (
         <p role="status" className="text-center">{t.contactForm.sent}</p>
       ) : (
-        <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
-          <label className="flex flex-col gap-1.5">
-            <span className="text-[0.75rem] uppercase">{t.contactForm.name}</span>
-            <input name="name" autoComplete="name" className={field} />
+        <form onSubmit={submit} className="grid gap-[15px] md:-mx-[1.5px] md:grid-cols-2">
+          <label>
+            <span className="sr-only">{t.contactForm.name}</span>
+            <input name="name" autoComplete="name" placeholder={t.contactForm.name} className={field} />
           </label>
-          <label className="flex flex-col gap-1.5">
-            <span className="text-[0.75rem] uppercase">{t.contactForm.email} *</span>
-            <input name="email" type="email" required autoComplete="email" className={field} />
+          <label>
+            <span className="sr-only">{t.contactForm.email}</span>
+            <input name="email" type="email" required autoComplete="email" placeholder={`${t.contactForm.email} *`} className={field} />
           </label>
-          <label className="flex flex-col gap-1.5 md:col-span-2">
-            <span className="text-[0.75rem] uppercase">{t.contactForm.phone}</span>
-            <input name="phone" type="tel" autoComplete="tel" className={field} />
+          <label className="md:col-span-2">
+            <span className="sr-only">{t.contactForm.phone}</span>
+            <input name="phone" type="tel" autoComplete="tel" placeholder={t.contactForm.phone} className={field} />
           </label>
-          <label className="flex flex-col gap-1.5 md:col-span-2">
-            <span className="text-[0.75rem] uppercase">{t.contactForm.comment} *</span>
-            <textarea name="body" required rows={5} className={field} />
+          <label className="md:col-span-2">
+            <span className="sr-only">{t.contactForm.comment}</span>
+            <textarea name="body" required placeholder={`${t.contactForm.comment} *`} className={`${field} block h-[226px]`} />
           </label>
           {/* Honeypot: hidden from people, filled in by bots. */}
           <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
           <div className="md:col-span-2">
-            <button type="submit" disabled={!medusaEnabled || status === "sending"} className="btn-primary w-full md:w-auto md:px-12 disabled:opacity-50">
+            <button type="submit" disabled={!medusaEnabled || status === "sending"} className="btn-secondary w-full px-6! md:w-auto disabled:opacity-50">
               {status === "sending" ? t.contactForm.sending : t.contactForm.send}
             </button>
             {status === "failed" && <p role="alert" className="mt-3 text-[0.875rem] text-red-700">{t.contactForm.failed}</p>}
