@@ -2,7 +2,17 @@
 
 import { useState } from "react"
 import type { StoreImage } from "@/lib/types"
+import type { ImageLoader } from "next/image"
 import { ProductImage } from "@/components/product-image"
+import { PRODUCT_PAGE_IMAGES } from "@/lib/image-settings"
+
+/** Next's own optimizer, but never below `min` pixels wide. */
+function minWidthLoader(min: number): ImageLoader {
+  return ({ src, width, quality }) =>
+    `/_next/image?url=${encodeURIComponent(src)}&w=${Math.max(width, min)}&q=${quality ?? PRODUCT_PAGE_IMAGES.quality}`
+}
+const desktopLoader = minWidthLoader(PRODUCT_PAGE_IMAGES.minWidthDesktop)
+const mobileLoader = minWidthLoader(PRODUCT_PAGE_IMAGES.minWidthMobile)
 import { useI18n } from "@/lib/i18n/client"
 
 /**
@@ -23,7 +33,8 @@ export function MediaGallery({ images, title }: { images: StoreImage[]; title: s
             src={img.url}
             alt={t.product.imageAlt(title, i + 1)}
             sizes="50vw"
-            quality={90}
+            quality={PRODUCT_PAGE_IMAGES.quality}
+            loader={desktopLoader}
             preload={i === 0}
             className="aspect-[1/1.25] w-full"
           />
@@ -45,7 +56,8 @@ export function MediaGallery({ images, title }: { images: StoreImage[]; title: s
               src={img.url}
               alt={t.product.imageAlt(title, i + 1)}
               sizes="100vw"
-              quality={90}
+              quality={PRODUCT_PAGE_IMAGES.quality}
+              loader={mobileLoader}
               className="aspect-[1/1.25] w-full shrink-0 snap-start"
             />
           ))}
