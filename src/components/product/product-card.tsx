@@ -1,7 +1,8 @@
 import { Link } from "@/components/link"
 import type { StoreProduct } from "@/lib/types"
 import { convertToLocale } from "@/lib/util/money"
-import { ProductImage, productThumbnail } from "@/components/product-image"
+import { productThumbnail } from "@/components/product-image"
+import { CardMedia } from "@/components/product/card-media"
 import { QuickAdd } from "@/components/product/quick-add"
 import type { Dictionary } from "@/lib/i18n/dictionaries"
 
@@ -19,6 +20,12 @@ export function isSoldOut(product: StoreProduct) {
   )
 }
 
+/** Thumbnail first, then the other product images, without repeats. */
+function cardImages(product: StoreProduct) {
+  const urls = [productThumbnail(product), ...product.images.map((i) => i.url)].filter((u): u is string => !!u)
+  return [...new Set(urls)]
+}
+
 /**
  * Product card from templates/collection.json: portrait image, then title and
  * price in one row (stacked and centred on mobile), uppercase 12px. Like
@@ -30,12 +37,7 @@ export function ProductCard({ product, locale, t }: { product: StoreProduct; loc
   return (
     <Link href={`/products/${product.handle}`} className="group block transition-transform duration-300 hover:-translate-y-[3px]">
       <div className="group/media relative overflow-hidden">
-        <ProductImage
-          src={productThumbnail(product)}
-          alt={product.title}
-          sizes="(min-width: 768px) 33vw, 50vw"
-          className="aspect-[4/5] w-full"
-        />
+        <CardMedia images={cardImages(product)} alt={product.title} />
         {soldOut ? (
           <span className="absolute left-2 top-2 bg-black px-2.5 py-1 text-[13px] font-light uppercase text-white">
             {t.product.soldOut}

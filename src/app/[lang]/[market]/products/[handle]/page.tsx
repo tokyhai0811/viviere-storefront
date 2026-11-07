@@ -8,12 +8,13 @@ import { getDictionary, getLang, getMarket } from "@/lib/i18n/server"
 import { isSoldOut, productPrice } from "@/components/product/product-card"
 import { productThumbnail } from "@/components/product-image"
 import { JsonLd } from "@/components/json-ld"
-import { SITE_NAME, SITE_URL, excerpt, pageMetadata, pickSeo } from "@/lib/seo"
+import { SITE_NAME, SITE_URL, excerpt, getSiteSettings, pageMetadata, pickSeo } from "@/lib/seo"
 import type { StoreProduct } from "@/lib/types"
 import { MediaGallery } from "@/components/product/media-gallery"
 import { AddToCart } from "@/components/product/add-to-cart"
 import { Accordion } from "@/components/product/accordion"
 import { CraftedSection } from "@/components/product/crafted-section"
+import { parseProductPage } from "@/lib/product-page"
 
 /**
  * templates/product.json: equal columns, media left (full bleed), sticky
@@ -85,11 +86,12 @@ export default async function ProductPage({ params }: PageProps<"/[lang]/[market
   const product = await getProductByHandle(handle)
   if (!product) notFound()
 
-  const [siblings, t, lang, market] = await Promise.all([
+  const [siblings, t, lang, market, settings] = await Promise.all([
     listColorSiblings(product),
     getDictionary(),
     getLang(),
     getMarket(),
+    getSiteSettings(),
   ])
   const meta = (key: Parameters<typeof metaText>[1]) => metaText(product, key, lang)
 
@@ -160,7 +162,7 @@ export default async function ProductPage({ params }: PageProps<"/[lang]/[market
         </div>
       </section>
 
-      <CraftedSection t={t} />
+      <CraftedSection t={t} content={parseProductPage(settings.theme_product, lang)} />
     </>
   )
 }
